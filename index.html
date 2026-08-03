@@ -283,6 +283,15 @@
 <div class="tooltip" id="tt" role="tooltip"></div>
 
 <script>
+/* Диагностика: если скрипт падает, показываем причину вместо пустой страницы */
+window.onerror=function(msg,src,line){
+  var d=document.createElement('div');
+  d.style.cssText='position:fixed;top:0;left:0;right:0;background:#B3400F;color:#fff;padding:14px 22px;font:14px/1.5 Segoe UI,Arial;z-index:999';
+  d.innerHTML='<b>Файл повреждён при редактировании</b> (строка '+line+'): '+String(msg).replace(/</g,'&lt;')+
+    '<br>Решение: замените index.html в репозитории на чистый файл из архива через <b>Add file → Upload files</b> (не через веб-редактор).';
+  document.body?document.body.appendChild(d):document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(d);});
+  return false;
+};
 /* =================================================================
    ДАННЫЕ ОТДЕЛЕНЫ ОТ ПРЕДСТАВЛЕНИЯ.
    Чтобы добавить регион — допишите объект в массив REGIONS
@@ -645,7 +654,7 @@ const CONFIG={
      После переезда в закрытый контур меняется только этот блок. */
   DATA_URLS:[
     "regions.json",
-    "" https://raw.githubusercontent.com/snischev-debug/region-profile/main/regions.json"
+    "" /* сюда вписать https://raw.githubusercontent.com/<user>/<repo>/main/regions.json */
   ],
   AUTO_CHECK_ON_LOAD:true,      /* проверять регламенты свежести при загрузке */
   /* Регламенты обновления разделов, в днях (из целеполагания ЦР v1.1) */
@@ -719,6 +728,19 @@ function applyRemote(arr){
   REGIONS.forEach(function(r){ if(!r.fo){for(var fo in FO_MAP){if(FO_MAP[fo].indexOf(r.region)>=0){r.fo=fo;break;}} r.fo=r.fo||"—";} });
   DATA_SOURCE="внешний источник";
 }
+/* Автовывод raw-адреса из адреса страницы на GitHub Pages:
+   https://user.github.io/repo/ -> https://raw.githubusercontent.com/user/repo/main/regions.json */
+function autoRawUrl(){
+  try{
+    var h=location.hostname, p=location.pathname.split('/').filter(Boolean);
+    if(/\.github\.io$/.test(h)&&p.length){
+      return 'https://raw.githubusercontent.com/'+h.split('.')[0]+'/'+p[0]+'/main/regions.json';
+    }
+  }catch(e){}
+  return null;
+}
+(function(){var u=autoRawUrl();if(u&&CONFIG.DATA_URLS.indexOf(u)<0)CONFIG.DATA_URLS.push(u);})();
+
 async function loadRemoteData(extraUrl){
   var urls=(extraUrl?[extraUrl]:[]).concat(CONFIG.DATA_URLS);
   for(var i=0;i<urls.length;i++){
