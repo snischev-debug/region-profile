@@ -208,6 +208,24 @@
   .bb .num{text-align:right;font-weight:700;color:var(--navy);white-space:nowrap}
   @media(max-width:760px){.bb{grid-template-columns:1fr;gap:4px}.bb .num{text-align:left}}
 
+  /* ---------- Фаза 1: конструктор закупок/воронки ---------- */
+  .dropzone{border:2px dashed #C6CBD6;border-radius:14px;padding:26px;text-align:center;color:var(--muted);font-size:13.5px;cursor:pointer;transition:.15s;background:#F7F8FA}
+  .dropzone:hover,.dropzone.over{border-color:var(--orange);color:var(--text);background:#FFF6F1}
+  .slot-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .slot-tab{border:1px solid var(--line);background:#F7F8FA;border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px}
+  .slot-tab.on{background:var(--slate);color:#fff;border-color:var(--slate)}
+  .slot-dot{width:9px;height:9px;border-radius:50%;background:#C6CBD6;display:inline-block}
+  .slot-dot.ok{background:#2E8B57}
+  .slot-dot.stale{background:var(--orange)}
+  .pvt-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0}
+  .pvt-controls label{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600}
+  .pvt-controls select,.pvt-controls input{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;font-family:inherit;background:#F7F8FA;color:var(--text)}
+  .pvt-wrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:12px}
+  .pvt-wrap table{font-size:12.5px}
+  .pvt-wrap th{position:sticky;top:0;z-index:2}
+  .pvt-wrap td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pvt-wrap tr.total td{font-weight:700;background:#EEF0F4}
+
   footer{padding:20px 34px 40px;max-width:1320px;margin:0 auto;font-size:12px;color:var(--muted)}
   @media(max-width:760px){
     header,nav,main{padding-left:16px;padding-right:16px}
@@ -235,6 +253,7 @@
   <button data-tab="ratings">Рейтинги главы</button>
   <button data-tab="ict">Интересы в ИКТ</button>
   <button data-tab="radar">Радар продаж</button>
+  <button data-tab="sales">Закупки и воронка</button>
   <button data-tab="compare">Сравнение регионов</button>
 </nav>
 <div class="toolbar">
@@ -252,6 +271,7 @@
   <div id="ratings" class="tab"></div>
   <div id="ict" class="tab"></div>
   <div id="radar" class="tab"></div>
+  <div id="sales" class="tab"></div>
   <div id="compare" class="tab"></div>
 </main>
 <footer>
@@ -625,7 +645,7 @@ const CONFIG={
      После переезда в закрытый контур меняется только этот блок. */
   DATA_URLS:[
     "regions.json",
-    "https://raw.githubusercontent.com/snischev-debug/region-profile/main/regions.json"
+    "" /* сюда вписать https://raw.githubusercontent.com/<user>/<repo>/main/regions.json */
   ],
   AUTO_CHECK_ON_LOAD:true,      /* проверять регламенты свежести при загрузке */
   /* Регламенты обновления разделов, в днях (из целеполагания ЦР v1.1) */
@@ -1041,6 +1061,205 @@ function renderRatings(){
   el.innerHTML=h;
 }
 
+/* ============ ФАЗА 1: КОНСТРУКТОР «ПОТЕНЦИАЛ vs ВОРОНКА vs ГОСЗАКУПКИ» ============
+   Универсальный движок: принимает любые Excel (.xlsx через SheetJS с CDN, подгружается
+   лениво) и CSV (парсится без библиотек). Три слота данных с регламентами свежести.
+   Персистентность: слот можно скачать как JSON и положить в репозиторий рядом с
+   regions.json — страница подтянет его автоматически (SLOT_URLS). */
+const SLOTS={
+  potential:{title:"Потенциал продаж",cadence:365,url:"potential.json",data:null},
+  funnel:{title:"Воронка продаж",cadence:30,url:"funnel.json",data:null},
+  procurement:{title:"Госзакупки",cadence:30,url:"procurement.json",data:null}
+};
+let curSlot="procurement";
+const PVT={rf:"",cf:"",vf:"",agg:"sum",ff:"",fv:""};
+
+async function loadSlotRemote(key){
+  const sl=SLOTS[key];
+  try{
+    const resp=await fetch(sl.url+"?v="+Date.now(),{cache:"no-store"});
+    if(!resp.ok)return false;
+    const j=await resp.json();
+    if(j&&j.rows&&j.headers){sl.data=j;return true;}
+  }catch(e){}
+  return false;
+}
+(async function(){for(const k in SLOTS){await loadSlotRemote(k);} if(document.getElementById('sales').classList.contains('active'))renderSales();})();
+
+function parseCSV(text){
+  const delim=(text.indexOf(";")>-1&&text.split("\n")[0].split(";").length>text.split("\n")[0].split(",").length)?";":",";
+  const lines=text.replace(/\r/g,"").split("\n").filter(x=>x.trim().length);
+  const parse=l=>{const out=[];let cur="",q=false;for(let i=0;i<l.length;i++){const c=l[i];
+    if(c==='"'){if(q&&l[i+1]==='"'){cur+='"';i++;}else q=!q;}
+    else if(c===delim&&!q){out.push(cur);cur="";}else cur+=c;}out.push(cur);return out;};
+  const headers=parse(lines[0]).map(h=>h.trim());
+  const rows=lines.slice(1).map(l=>{const c=parse(l);const o={};headers.forEach((h,i)=>o[h]=(c[i]||"").trim());return o;});
+  return {headers,rows};
+}
+let sheetJSReady=null;
+function ensureSheetJS(){
+  if(window.XLSX)return Promise.resolve();
+  if(sheetJSReady)return sheetJSReady;
+  sheetJSReady=new Promise((res,rej)=>{
+    const sc=document.createElement('script');
+    sc.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    sc.onload=()=>res();sc.onerror=()=>rej(new Error("Не удалось загрузить библиотеку чтения Excel (нужен интернет). Сохраните файл как CSV — он читается без библиотек."));
+    document.head.appendChild(sc);
+  });
+  return sheetJSReady;
+}
+async function handleFile(file){
+  const sl=SLOTS[curSlot];
+  try{
+    let parsed;
+    if(/\.csv$/i.test(file.name)){
+      parsed=parseCSV(await file.text());
+    }else{
+      await ensureSheetJS();
+      const wb=XLSX.read(await file.arrayBuffer(),{type:"array"});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const arr=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+      const hIdx=arr.findIndex(r=>r.filter(c=>String(c).trim()).length>=2);
+      const headers=arr[hIdx].map(h=>String(h).trim()||"col");
+      const rows=arr.slice(hIdx+1).filter(r=>r.some(c=>String(c).trim()))
+        .map(r=>{const o={};headers.forEach((h,i)=>o[h]=r[i]!==undefined?r[i]:"");return o;});
+      parsed={headers,rows};
+    }
+    sl.data={headers:parsed.headers,rows:parsed.rows,name:file.name,loadedAt:new Date().toISOString().slice(0,10)};
+    PVT.rf=PVT.cf=PVT.vf=PVT.ff="";PVT.fv="";
+    renderSales();
+  }catch(e){alert("Ошибка чтения файла: "+e.message);}
+}
+function toNum(v){
+  if(typeof v==="number")return v;
+  const n=parseFloat(String(v).replace(/\s|\u00a0/g,"").replace(",","."));
+  return isNaN(n)?null:n;
+}
+function guessValueField(d){
+  for(const h of d.headers){
+    let hit=0,tot=0;
+    for(const r of d.rows.slice(0,25)){tot++;if(toNum(r[h])!==null)hit++;}
+    if(tot&&hit/tot>0.7&&!/№|код|инн|тел/i.test(h))return h;
+  }
+  return d.headers[d.headers.length-1];
+}
+function buildPivot(d){
+  const rows=d.rows.filter(r=>!PVT.ff||!PVT.fv||String(r[PVT.ff])===PVT.fv);
+  const rk={},ck={},cell={};
+  rows.forEach(r=>{
+    const rv=String(r[PVT.rf]||"(пусто)"),cv=PVT.cf?String(r[PVT.cf]||"(пусто)"):"Значение";
+    rk[rv]=1;ck[cv]=1;
+    const key=rv+"\u0001"+cv;
+    const num=PVT.agg==="count"?1:toNum(r[PVT.vf]);
+    if(!cell[key])cell[key]={s:0,n:0};
+    if(num!==null){cell[key].s+=num;cell[key].n++;}
+    else if(PVT.agg==="count"){cell[key].s+=1;cell[key].n++;}
+  });
+  const rKeys=Object.keys(rk).sort(),cKeys=Object.keys(ck).sort();
+  const val=k=>{const c=cell[k];if(!c||!c.n)return null;
+    return PVT.agg==="avg"?c.s/c.n:c.s;};
+  return {rKeys,cKeys,val};
+}
+function fmtNum(v){
+  if(v===null)return "—";
+  return (Math.round(v*100)/100).toLocaleString("ru-RU");
+}
+function slotDot(sl){
+  if(!sl.data)return '<span class="slot-dot"></span>';
+  const d=daysSince(sl.data.loadedAt);
+  return '<span class="slot-dot '+(d>sl.cadence?'stale':'ok')+'"></span>';
+}
+function exportSlot(){
+  const sl=SLOTS[curSlot];
+  if(!sl.data){alert("Слот пуст.");return;}
+  const blob=new Blob([JSON.stringify(sl.data)],{type:"application/json"});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=sl.url;a.click();
+}
+function renderSales(){
+  const el=document.getElementById('sales');
+  const sl=SLOTS[curSlot],d=sl.data;
+  let h='<div class="card"><h3>Закупки и воронка — конструктор отчётов (Фаза 1, приоритет 1)</h3>'+
+    '<div class="note" style="margin-bottom:12px">Три набора данных с регламентами: Потенциал — ежегодно, Воронка и Госзакупки — ежемесячно. Загрузите Excel/CSV в активный слот, соберите сводную. Чтобы данные видели все пользователи: «Скачать JSON слота» → закоммитить файл в репозиторий рядом с regions.json.</div>'+
+    '<div class="slot-tabs">'+Object.keys(SLOTS).map(k=>{
+      const x=SLOTS[k];
+      return '<button class="slot-tab'+(k===curSlot?' on':'')+'" onclick="curSlot=\''+k+'\';Object.assign(PVT,{rf:\'\',cf:\'\',vf:\'\',ff:\'\',fv:\'\'});renderSales()">'+slotDot(x)+esc(x.title)+
+        (x.data?' · '+esc(x.data.loadedAt):'')+'</button>';}).join('')+'</div>';
+  if(d&&daysSince(d.loadedAt)>sl.cadence){
+    h+='<div class="banner">⚠ «'+esc(sl.title)+'»: данные от '+esc(d.loadedAt)+' старше регламента ('+sl.cadence+' дн.). Загрузите свежую выгрузку.</div>';
+  }
+  h+='<div class="dropzone" id="dz" onclick="document.getElementById(\'fileInp\').click()">'+
+    (d?'Загружен: <b>'+esc(d.name||sl.url)+'</b> — '+d.rows.length+' строк, '+d.headers.length+' колонок. Кликните или перетащите файл, чтобы заменить.':'Перетащите сюда Excel (.xlsx) или CSV с выгрузкой «'+esc(sl.title)+'» — или кликните для выбора файла')+
+    '</div><input type="file" id="fileInp" accept=".xlsx,.xls,.csv" style="display:none">';
+  h+='</div>';
+  if(d){
+    if(!PVT.rf){PVT.rf=d.headers[0];PVT.vf=guessValueField(d);}
+    const opt=(list,cur,empty)=> (empty?'<option value="">'+empty+'</option>':'')+list.map(x=>'<option'+(x===cur?' selected':'')+'>'+esc(x)+'</option>').join('');
+    const fvals=PVT.ff?[...new Set(d.rows.map(r=>String(r[PVT.ff]||"(пусто)")))].sort().slice(0,300):[];
+    h+='<div class="card"><h3>Сводная таблица: '+esc(sl.title)+'</h3><div class="pvt-controls">'+
+      '<div><label>Строки</label><select onchange="PVT.rf=this.value;renderSales()">'+opt(d.headers,PVT.rf)+'</select></div>'+
+      '<div><label>Столбцы (опц.)</label><select onchange="PVT.cf=this.value;renderSales()">'+opt(d.headers,PVT.cf,"— без столбцов —")+'</select></div>'+
+      '<div><label>Значение</label><select onchange="PVT.vf=this.value;renderSales()">'+opt(d.headers,PVT.vf)+'</select></div>'+
+      '<div><label>Агрегация</label><select onchange="PVT.agg=this.value;renderSales()">'+
+        ['sum','count','avg'].map(a=>'<option value="'+a+'"'+(a===PVT.agg?' selected':'')+'>'+({sum:'Сумма',count:'Количество',avg:'Среднее'})[a]+'</option>').join('')+'</select></div>'+
+      '<div><label>Фильтр: поле</label><select onchange="PVT.ff=this.value;PVT.fv=\'\';renderSales()">'+opt(d.headers,PVT.ff,"— без фильтра —")+'</select></div>'+
+      '<div><label>Фильтр: значение</label><select onchange="PVT.fv=this.value;renderSales()" '+(PVT.ff?'':'disabled')+'>'+opt(fvals,PVT.fv,"— все —")+'</select></div>'+
+      '</div>';
+    const p=buildPivot(d);
+    let rowTotals={},colTotals={},grand=0;
+    h+='<div class="pvt-wrap"><table><thead><tr><th>'+esc(PVT.rf)+'</th>'+p.cKeys.map(c=>'<th>'+esc(c)+'</th>').join('')+'<th>Итого</th></tr></thead><tbody>';
+    p.rKeys.forEach(rv=>{
+      let rt=0;
+      h+='<tr><td><b>'+esc(rv)+'</b></td>'+p.cKeys.map(cv=>{
+        const v=p.val(rv+"\u0001"+cv);
+        if(v!==null){rt+=v;colTotals[cv]=(colTotals[cv]||0)+v;grand+=v;}
+        return '<td class="num">'+fmtNum(v)+'</td>';}).join('')+
+        '<td class="num"><b>'+fmtNum(PVT.agg==="avg"?null:rt)+'</b></td></tr>';
+    });
+    h+='<tr class="total"><td>Итого</td>'+p.cKeys.map(cv=>'<td class="num">'+fmtNum(PVT.agg==="avg"?null:(colTotals[cv]||0))+'</td>').join('')+'<td class="num">'+fmtNum(PVT.agg==="avg"?null:grand)+'</td></tr>';
+    h+='</tbody></table></div>';
+    h+='<div class="row" style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap">'+
+      '<button class="tb-btn ghost" onclick="exportSlot()">Скачать JSON слота (для репозитория)</button></div>';
+    h+='</div>';
+    /* Сопоставление трёх наборов, если загружено ≥2 */
+    const loaded=Object.keys(SLOTS).filter(k=>SLOTS[k].data);
+    if(loaded.length>=2){
+      h+='<div class="card"><h3>Сопоставление: Потенциал vs Воронка vs Госзакупки</h3>'+
+        '<div class="note" style="margin-bottom:10px">Выберите в каждом наборе ключевую колонку (регион или продукт) и колонку суммы — таблица сведёт наборы по общему ключу и посчитает покрытие: Воронка/Потенциал и Закупки/Потенциал.</div>'+
+        '<div class="pvt-controls">'+loaded.map(k=>{
+          const x=SLOTS[k];x.key=x.key||x.data.headers.find(h2=>/регион|субъект|продукт|направлен/i.test(h2))||x.data.headers[0];
+          x.val=x.val||guessValueField(x.data);
+          return '<div><label>'+esc(x.title)+': ключ</label><select onchange="SLOTS.'+k+'.key=this.value;renderSales()">'+x.data.headers.map(h2=>'<option'+(h2===x.key?' selected':'')+'>'+esc(h2)+'</option>').join('')+'</select>'+
+            '<label style="margin-top:6px">'+esc(x.title)+': сумма</label><select onchange="SLOTS.'+k+'.val=this.value;renderSales()">'+x.data.headers.map(h2=>'<option'+(h2===x.val?' selected':'')+'>'+esc(h2)+'</option>').join('')+'</select></div>';
+        }).join('')+'</div>';
+      const agg={};
+      loaded.forEach(k=>{const x=SLOTS[k];
+        x.data.rows.forEach(r=>{const key=String(r[x.key]||"(пусто)").trim();const n=toNum(r[x.val]);
+          agg[key]=agg[key]||{};agg[key][k]=(agg[key][k]||0)+(n||0);});});
+      const keys=Object.keys(agg).sort();
+      h+='<div class="pvt-wrap"><table><thead><tr><th>Ключ</th>'+loaded.map(k=>'<th>'+esc(SLOTS[k].title)+'</th>').join('')+
+        (SLOTS.potential.data&&SLOTS.funnel.data?'<th>Воронка/Потенциал</th>':'')+
+        (SLOTS.potential.data&&SLOTS.procurement.data?'<th>Закупки/Потенциал</th>':'')+'</tr></thead><tbody>';
+      keys.forEach(key=>{
+        const a=agg[key];
+        h+='<tr><td><b>'+esc(key)+'</b></td>'+loaded.map(k=>'<td class="num">'+fmtNum(a[k]||0)+'</td>').join('');
+        if(SLOTS.potential.data&&SLOTS.funnel.data)h+='<td class="num">'+(a.potential?Math.round((a.funnel||0)/a.potential*100)+"%":"—")+'</td>';
+        if(SLOTS.potential.data&&SLOTS.procurement.data)h+='<td class="num">'+(a.potential?Math.round((a.procurement||0)/a.potential*100)+"%":"—")+'</td>';
+        h+='</tr>';
+      });
+      h+='</tbody></table></div></div>';
+    }
+  }
+  el.innerHTML=h;
+  const dz=document.getElementById('dz'),fi=document.getElementById('fileInp');
+  if(dz){
+    ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over');}));
+    ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('over');}));
+    dz.addEventListener('drop',e=>{if(e.dataTransfer.files.length)handleFile(e.dataTransfer.files[0]);});
+    fi.addEventListener('change',e=>{if(e.target.files.length)handleFile(e.target.files[0]);});
+  }
+}
+
 /* --- Радар продаж: 6 контуров мониторинга --- */
 async function updateRadarSignals(){
   const r=cur;
@@ -1220,7 +1439,7 @@ function showTT(e,i){
 }
 function hideTT(){tt.style.opacity=0;}
 
-function renderAll(){renderProfile();renderStatements();renderTeam();renderRatings();renderICT();renderRadar();renderFreshness();
+function renderAll(){renderProfile();renderStatements();renderTeam();renderRatings();renderICT();renderRadar();renderSales();renderFreshness();
   if(document.getElementById('compare').classList.contains('active'))renderCompare();}
 
 /* Бутстрап: пробуем внешний источник, затем рендерим */
