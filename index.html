@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Профиль заказчика в регионе — Ростелеком / Башинформсвязь</title>
+<style>
+  :root{
+    /* Палитра презентации «Классификация заказчика в регионе» */
+    --page:#EEF0F4;          /* светло-серый фон слайда */
+    --card:#FFFFFF;          /* белые карточки */
+    --slate:#5B6272;         /* тёмный серо-синий заголовочный блок */
+    --slate2:#6A7183;
+    --navy:#1B2434;          /* тёмно-синий титульный слайд */
+    --orange:#FF4F12;        /* оранжевый акцент */
+    --orange2:#FF7A4D;
+    --violet:#7700FF;        /* фиолетовый круг-логотип */
+    --text:#3A4152;
+    --muted:#7A8294;
+    --line:#DFE2E9;
+    --ok:#2E8B57;
+    --okbg:#E8F5EE;
+    --shadow:0 6px 24px rgba(27,36,52,.08);
+    --r:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--page);color:var(--text);font-family:'Segoe UI',system-ui,Roboto,Arial,sans-serif;font-size:15px;line-height:1.55}
+
+  /* ---------- Шапка в стиле титульного слайда ---------- */
+  header{background:var(--navy);color:#fff;padding:22px 34px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:42px;height:42px;border-radius:50%;background:var(--violet);position:relative;flex-shrink:0}
+  .logo::after{content:"";position:absolute;inset:9px;border:3px solid #fff;border-radius:50%;border-bottom-color:transparent;transform:rotate(-45deg)}
+  .brand h1{font-size:21px;font-weight:600;letter-spacing:.2px}
+  .brand h1 small{display:block;font-size:12px;font-weight:400;color:#9AA3B5;letter-spacing:.4px;margin-top:2px}
+  .region-select{display:flex;align-items:center;gap:10px}
+  .region-select label{font-size:13px;color:#9AA3B5}
+  select{background:#242F44;color:#fff;border:1px solid #38445E;padding:10px 16px;border-radius:12px;font-size:14px;cursor:pointer;min-width:280px}
+  select:focus{outline:2px solid var(--orange)}
+
+  /* ---------- Навигация ---------- */
+  nav{background:var(--card);padding:0 34px;border-bottom:1px solid var(--line);display:flex;gap:2px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(27,36,52,.04)}
+  nav button{background:none;border:none;color:var(--muted);padding:16px 22px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:.18s;font-family:inherit}
+  nav button:hover{color:var(--text)}
+  nav button.active{color:var(--orange);border-bottom-color:var(--orange)}
+  nav button:focus-visible{outline:2px solid var(--orange);outline-offset:-2px}
+
+  main{padding:30px 34px 60px;max-width:1320px;margin:0 auto}
+  .tab{display:none}.tab.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.tab.active{animation:none}}
+
+  /* ---------- Герой-карточка главы ---------- */
+  .hero{display:flex;gap:24px;align-items:center;background:var(--navy);color:#fff;border-radius:24px;padding:28px 32px;margin-bottom:24px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .avatar{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange2));display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;color:#fff;flex-shrink:0}
+  .hero-info h2{font-size:26px;font-weight:600;margin-bottom:4px}
+  .hero-info .sub{color:#9AA3B5;font-size:14px}
+  .badge{display:inline-block;background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-left:10px;vertical-align:middle;letter-spacing:.3px}
+  .badge.demo{background:var(--slate2)}
+
+  /* ---------- Карточки ---------- */
+  .card{background:var(--card);border-radius:var(--r);padding:24px;margin-bottom:18px;box-shadow:var(--shadow)}
+  .card>h3{color:var(--navy);font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .card>h3::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--orange);flex-shrink:0}
+  .note{font-size:12.5px;color:var(--muted);margin-top:6px;font-style:italic}
+
+  /* ---------- Опросник в стиле слайдов (тёмные плашки + оранжевые буллеты) ---------- */
+  .q{border-radius:14px;margin-bottom:12px;overflow:hidden;border:1px solid var(--line)}
+  .q-head{padding:0;cursor:pointer;display:flex;justify-content:space-between;align-items:stretch;background:var(--slate);color:#fff;transition:.15s}
+  .q-head:hover{background:var(--slate2)}
+  .q-head-left{display:flex;align-items:center;gap:0;flex:1;min-width:0}
+  .q-num{background:rgba(255,255,255,.12);padding:14px 18px;font-weight:700;font-size:15px;align-self:stretch;display:flex;align-items:center}
+  .q-title{padding:14px 16px;font-weight:600;font-size:14.5px}
+  .q-right{display:flex;align-items:center;gap:12px;padding-right:16px;flex-shrink:0}
+  .q-choice{font-size:12px;background:var(--orange);color:#fff;padding:5px 14px;border-radius:20px;font-weight:700;white-space:nowrap}
+  .arrow{transition:.2s;color:#C6CBD6;font-size:12px}
+  .q.open .arrow{transform:rotate(90deg)}
+  .q-body{max-height:0;overflow:hidden;transition:max-height .3s ease;background:#F7F8FA}
+  .q.open .q-body{max-height:700px}
+  .q-body-inner{padding:18px 20px}
+  .options{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .opt{font-size:13.5px;color:var(--muted);position:relative;padding-left:22px}
+  .opt::before{content:"";position:absolute;left:0;top:7px;width:9px;height:9px;border-radius:50%;background:#C6CBD6}
+  .opt.sel{color:var(--text);font-weight:600}
+  .opt.sel::before{background:var(--orange)}
+  .opt.sel::after{content:"выбрано";margin-left:10px;font-size:10.5px;font-weight:700;color:var(--ok);background:var(--okbg);padding:2px 8px;border-radius:10px;vertical-align:middle}
+  .just{font-size:14px;line-height:1.65;color:var(--text);border-left:3px solid var(--orange);padding-left:14px}
+  .src{font-size:11.5px;color:var(--muted);margin-top:8px;padding-left:17px}
+
+  /* ---------- Шкалы классификации ---------- */
+  .scale-wrap{margin:18px 0}
+  .scale-label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  .scale{height:12px;background:linear-gradient(90deg,var(--slate),var(--orange));border-radius:8px;position:relative}
+  .scale-marker{position:absolute;top:-6px;width:8px;height:24px;background:var(--navy);border:2px solid #fff;border-radius:4px;box-shadow:0 2px 6px rgba(27,36,52,.35)}
+  .scale-val{text-align:center;margin-top:8px;font-weight:700;color:var(--orange);font-size:14px}
+  .class-label{font-size:19px;font-weight:700;color:var(--navy);margin-bottom:8px}
+  .class-summary{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:18px}
+
+  /* ---------- Команда ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .team-card{background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--line);border-top:5px solid var(--line);box-shadow:var(--shadow)}
+  .team-card.unified{border-top-color:var(--ok)}
+  .team-card.own{border-top-color:var(--orange)}
+  .team-card h4{font-size:15.5px;color:var(--navy);margin-bottom:2px}
+  .team-card .role{color:var(--muted);font-size:12.5px;margin-bottom:10px}
+  .team-card .bg{font-size:13.5px;line-height:1.55;margin-bottom:10px}
+  .vec-tag{font-size:11px;font-weight:700;padding:4px 12px;border-radius:16px;display:inline-block;letter-spacing:.2px}
+  .vec-tag.u{background:var(--okbg);color:var(--ok)}
+  .vec-tag.o{background:#FFEDE5;color:var(--orange)}
+  .digi{font-size:12px;color:var(--muted);margin-top:8px;display:block;line-height:1.5}
+
+  /* ---------- Таблица ИКТ ---------- */
+  .table-wrap{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:13px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--slate);color:#fff;cursor:pointer;user-select:none;font-weight:600;font-size:13px;white-space:nowrap}
+  th:hover{background:var(--slate2)}
+  th .sort-ind{font-size:10px;margin-left:4px;opacity:.7}
+  tr:hover td{background:#F7F8FA}
+  .pri{font-weight:700;padding:4px 12px;border-radius:14px;font-size:11px;display:inline-block;white-space:nowrap;letter-spacing:.3px}
+  .pri.high{background:#FFEDE5;color:var(--orange)}
+  .pri.mid{background:#FFF6E0;color:#B08415}
+  .pri.low{background:#EEF0F4;color:var(--muted)}
+
+  /* ---------- Пузырьковая диаграмма ---------- */
+  .bubble-wrap{background:var(--card);border-radius:var(--r);padding:10px}
+  svg{width:100%;height:auto;display:block}
+  .bubble{cursor:pointer;transition:.15s}
+  .bubble:hover{opacity:.85;stroke:var(--navy);stroke-width:2.5}
+  .tooltip{position:fixed;background:var(--navy);color:#fff;border-radius:10px;padding:10px 14px;font-size:12.5px;pointer-events:none;opacity:0;transition:.12s;z-index:100;max-width:240px;line-height:1.5;box-shadow:0 8px 24px rgba(27,36,52,.35)}
+  .legend{display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted);padding:0 10px 6px}
+  .legend b{color:var(--text)}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+
+  /* ---------- Рейтинги ---------- */
+  .r-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:18px}
+  .r-card{background:var(--card);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+  .r-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:4px}
+  .r-card h4{font-size:15.5px;color:var(--navy);line-height:1.35}
+  .r-card .r-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .r-now{text-align:right;flex-shrink:0}
+  .r-now .val{font-size:28px;font-weight:700;color:var(--navy);line-height:1}
+  .r-now .unit{font-size:11px;color:var(--muted)}
+  .delta{font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px;display:inline-block;margin-top:5px}
+  .delta.up{background:var(--okbg);color:var(--ok)}
+  .delta.down{background:#FDEAE3;color:#C43C10}
+  .delta.flat{background:#EEF0F4;color:var(--muted)}
+  .r-note{font-size:12.5px;color:var(--text);line-height:1.55;margin-top:12px;border-left:3px solid var(--orange);padding-left:12px}
+  .r-src{font-size:11px;color:var(--muted);margin-top:8px}
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:18px}
+  .kpi{background:var(--slate);color:#fff;border-radius:14px;padding:16px 18px}
+  .kpi .k-val{font-size:24px;font-weight:700;color:#fff}
+  .kpi .k-val span{color:var(--orange2);font-size:14px;font-weight:600;margin-left:4px}
+  .kpi .k-lbl{font-size:12px;color:#C6CBD6;margin-top:3px;line-height:1.4}
+
+  /* ---------- Онлайн-слой: тулбар, обновление, высказывания ---------- */
+  .toolbar{background:var(--card);border-bottom:1px solid var(--line);padding:10px 34px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .tb-btn{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px}
+  .tb-btn:hover{background:#2A3650}
+  .tb-btn.accent{background:var(--orange)}
+  .tb-btn.accent:hover{background:#E64810}
+  .tb-btn.ghost{background:#EEF0F4;color:var(--text)}
+  .tb-btn:disabled{opacity:.55;cursor:wait}
+  .fresh{font-size:12px;color:var(--muted);margin-left:auto}
+  .fresh b{color:var(--ok)}
+  .fresh.stale b{color:var(--orange)}
+  .banner{background:#FFF3EC;border:1px solid #FFD2BE;color:#B3400F;border-radius:12px;padding:12px 16px;font-size:13px;margin-bottom:16px;display:flex;gap:10px;align-items:center}
+  .spinner{width:14px;height:14px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .modal-bg{position:fixed;inset:0;background:rgba(27,36,52,.55);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--card);border-radius:20px;padding:26px;max-width:640px;width:100%;max-height:84vh;overflow:auto;box-shadow:0 20px 60px rgba(27,36,52,.4)}
+  .modal h3{color:var(--navy);font-size:17px;margin-bottom:12px}
+  .modal p{font-size:13.5px;color:var(--text);margin-bottom:12px;line-height:1.6}
+  .modal select,.modal textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--text);background:#F7F8FA;margin-bottom:12px}
+  .modal textarea{min-height:140px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+  .modal .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  .log{font-size:12px;color:var(--muted);background:#F7F8FA;border-radius:10px;padding:10px 12px;margin-bottom:12px;max-height:160px;overflow:auto;font-family:ui-monospace,Consolas,monospace;white-space:pre-wrap}
+  /* Лента высказываний */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{background:#EEF0F4;color:var(--muted);border:none;border-radius:20px;padding:7px 15px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .chip.on{background:var(--orange);color:#fff}
+  .stmt{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .stmt:last-child{border-bottom:none}
+  .stmt-date{flex-shrink:0;width:86px;font-size:12px;font-weight:700;color:var(--orange);padding-top:2px}
+  .stmt-body .txt{font-size:14px;line-height:1.6;color:var(--text)}
+  .stmt-body .meta{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .stmt-tag{display:inline-block;background:#EEF0F4;color:var(--slate);font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;margin-right:6px;letter-spacing:.2px}
+
+  /* ---------- Радар продаж ---------- */
+  .cadence{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:12px;background:#E9EDF7;color:#3D5A99;letter-spacing:.3px;white-space:nowrap}
+  .radar-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .sig{border-left:4px solid var(--line);padding:10px 14px;margin-bottom:10px;background:#F7F8FA;border-radius:0 12px 12px 0;font-size:13.5px;line-height:1.55}
+  .sig.hot{border-left-color:var(--orange)}
+  .sig.warm{border-left-color:#E7B10A}
+  .sig .sig-meta{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .sig .arrow-to{color:var(--orange);font-weight:700}
+  .status-pill{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:12px;white-space:nowrap}
+  .status-pill.won{background:var(--okbg);color:var(--ok)}
+  .status-pill.lost{background:#FDEAE3;color:#C43C10}
+  .status-pill.open{background:#FFF6E0;color:#B08415}
+  .budget-bars{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+  .bb{display:grid;grid-template-columns:220px 1fr 110px;gap:12px;align-items:center;font-size:13px}
+  .bb .track{height:14px;background:#EEF0F4;border-radius:8px;overflow:hidden}
+  .bb .fill{height:100%;background:linear-gradient(90deg,var(--slate),var(--slate2));border-radius:8px}
+  .bb .fill.acc{background:linear-gradient(90deg,var(--orange),var(--orange2))}
+  .bb .num{text-align:right;font-weight:700;color:var(--navy);white-space:nowrap}
+  @media(max-width:760px){.bb{grid-template-columns:1fr;gap:4px}.bb .num{text-align:left}}
+
+  footer{padding:20px 34px 40px;max-width:1320px;margin:0 auto;font-size:12px;color:var(--muted)}
+  @media(max-width:760px){
+    header,nav,main{padding-left:16px;padding-right:16px}
+    select{min-width:0;width:100%}
+    .q-right{padding-right:10px}
+    .q-choice{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true"></div>
+    <h1>Профиль заказчика в регионе<small>Ростелеком · ПАО «Башинформсвязь» · B2G2 «Цифровой регион»</small></h1>
+  </div>
+  <div class="region-select">
+    <label for="regSel">Регион:</label>
+    <select id="regSel" aria-label="Выбор региона"></select>
+  </div>
+</header>
+<nav>
+  <button data-tab="profile" class="active">Профиль главы</button>
+  <button data-tab="statements">Высказывания</button>
+  <button data-tab="team">Команда</button>
+  <button data-tab="ratings">Рейтинги главы</button>
+  <button data-tab="ict">Интересы в ИКТ</button>
+  <button data-tab="radar">Радар продаж</button>
+  <button data-tab="compare">Сравнение регионов</button>
+</nav>
+<div class="toolbar">
+  <button class="tb-btn accent" id="btnPull" title="Мгновенно подтянуть свежий regions.json из репозитория проекта">⬇ Обновить из интернета</button>
+  <button class="tb-btn" id="btnUpdate" title="ИИ-поиск свежих рейтингов и высказываний (работает в Claude.ai)">⟳ ИИ-поиск свежего</button>
+  <button class="tb-btn" id="btnAddRegion">✓ Верифицировать главу (ИИ)</button>
+  <button class="tb-btn ghost" id="btnExport">Экспорт данных JSON</button>
+  <button class="tb-btn ghost" id="btnImport">Импорт JSON</button>
+  <span class="fresh" id="freshness"></span>
+</div>
+<main>
+  <div id="profile" class="tab active"></div>
+  <div id="statements" class="tab"></div>
+  <div id="team" class="tab"></div>
+  <div id="ratings" class="tab"></div>
+  <div id="ict" class="tab"></div>
+  <div id="radar" class="tab"></div>
+  <div id="compare" class="tab"></div>
+</main>
+<footer>
+  Данные по Республике Башкортостан — результаты исследования (июль 2026, открытые источники: glavarb.ru, Башинформ, РБК-Уфа, Интерфакс, Коммерсантъ). Демо-регионы — заглушки для проверки механики сравнения; заполняются при исследовании соответствующего региона. Оценки позиций на осях — экспертная интерпретация.
+</footer>
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div class="tooltip" id="tt" role="tooltip"></div>
+
+<script>
+/* =================================================================
+   ДАННЫЕ ОТДЕЛЕНЫ ОТ ПРЕДСТАВЛЕНИЯ.
+   Чтобы добавить регион — допишите объект в массив REGIONS
+   с той же структурой. isDemo:true помечает заглушку.
+   ================================================================= */
+
+function demoQ(who){
+  const t=["Кто ВДЛ в прошлом","Единая команда или векторы","Долгосрочные цели","Позиционирование региона","Стиль постановки задач","Канал коммуникации","Фокус внимания","Стратегические цели","Критерии успеха","Бюджетные приоритеты"];
+  return t.map((x,i)=>({n:String(i+1).padStart(2,"0"),title:x,choice:"Заглушка",opts:["Демо-заглушка — заполняется при исследовании региона"],sel:0,
+    just:"Демонстрационная заглушка ("+who+"). Структура данных идентична реальному профилю: код выбранного варианта, обоснование с фактами и датами, источник.",src:"демо"}));
+}
+
+const REGIONS = [
+{
+  id:"rb", name:"Радий Хабиров", region:"Республика Башкортостан", initials:"РХ",
+  isDemo:false, population:4046100, x:65, y:55, lastUpdated:"2026-07-02",
+  statements:[
+   {d:"2026-06",tag:"Международка",txt:"Активизация внешнеэкономического трека: новые соглашения и рабочие контакты с Узбекистаном и Таджикистаном — фактор перехода в «зелёную зону» рейтинга Минченко.",src:"Минченко консалтинг / Башинформ, 02.06.2026"},
+   {d:"2026-06",tag:"Инвестиции",txt:"На ПМЭФ-2026 подтверждено 3-е место Башкортостана в Нацрейтинге инвестклимата АСИ — третий год подряд; инвестиции за 2025 год — 852,6 млрд ₽.",src:"АСИ / Башинформ, 05.06.2026"},
+   {d:"2026-01",tag:"Стратегия",txt:"Послание Госсобранию-Курултаю: рамка «Цель — Победа, задача — развитие» — приоритет поддержки СВО при продолжении инвестиционной и инфраструктурной повестки.",src:"Башинформ, 30.01.2026 / 05.02.2026"},
+   {d:"2025-12",tag:"Бюджет",txt:"Бюджет-2026 принят с дефицитом 22,5 млрд ₽ при доходах 316,2 млрд ₽; по поручению федцентра запущена «программа оздоровления финансов», цель — бездефицитность к 2028 году.",src:"РБК-Уфа, 18.12.2025"},
+   {d:"2025-12",tag:"Инвестиции",txt:"ОЭЗ «Алга» вошла в тройку лидеров Национального рейтинга инвестпривлекательности ОЭЗ России — фактор роста Хабирова в рейтинге влияния АПЭК до 14-го места.",src:"АПЭК, декабрь 2025"},
+   {d:"2025-09",tag:"Цифра/БАС",txt:"Заявка на лидерство в «дронофикации»: республика в тройке регионов-лидеров по внедрению беспилотных авиасистем, развитие НПЦ БАС.",src:"Башинформ, 01.09.2025"},
+   {d:"2025-04",tag:"Образование",txt:"Личная инспекция строительства второй очереди кампуса Евразийского НОЦ — флагманский имиджевый проект в федеральной повестке главы.",src:"Медиалогия, апрель 2025"},
+   {d:"2025-01",tag:"Безопасность",txt:"Утверждён порядок подключения частных камер видеонаблюдения к региональной системе — постбаймакский вектор на консолидацию видеонаблюдения.",src:"Правительство РБ, январь 2025"},
+   {d:"2024-12",tag:"Стратегия",txt:"Послание Курултаю: цели к 2030 году — ВРП до 4 трлн ₽ и годовой объём инвестиций до 1,25 трлн ₽; участие в 28 федпроектах и 11 нацпроектах.",src:"Башинформ, 12.12.2024"},
+   {d:"2024-10",tag:"Контроль",txt:"Стиль ручного контроля: публичные поручения на оперативках с фиксированными сроками — в т.ч. отработать 1001 обращение с Прямой линии за два месяца, контрольное управление с фотофиксацией исполнения.",src:"glavarb.ru / Prufy, 2024–2025"},
+   {d:"2024-09",tag:"Выборы",txt:"Переизбран главой республики на выборах 08.09.2024 с результатом 80,21% — мандат подтверждён несмотря на январские события в Баймаке.",src:"Интерфакс, 09.09.2024"},
+   {d:"2024-05",tag:"Туризм",txt:"Туристическая повестка: геопарки Торатау и Янгантау (единственные в РФ в сети ЮНЕСКО), доходы от туризма — 24 млрд ₽ по итогам 2025 года.",src:"Госкомтуризм РБ, 2024–2025"}
+  ],
+  classification:{ label:"Лидер с сильным хозяйственно-контрольным креном", hozLider:65, opStrat:55, polTech:70,
+    summary:"Госслужащий-политтехнолог. Ось «Хозяйственник ↔ Лидер» ~65/35 в сторону Лидера: форумы, инвесторы, рейтинги, ИТ как инструмент имиджа и качества жизни. Но дефицит бюджета (22,5 млрд ₽ на 2026) и постбаймакский контроль тянут к хозяйственнику. «Операционщик ↔ Стратег» ~55/45: видение-2030 есть, но много ручного управления. «Технократ ↔ Публичный политик» ~70/30: Хабиров — коммуникатор, технократия делегирована (Муратов, Разумикин)." },
+  questions:[
+   {n:"01",title:"Кто ВДЛ в прошлом?",choice:"Госслужащий",opts:["Государственный/муниципальный служащий","Представитель бизнеса","Силовые структуры","Другое"],sel:0,
+    just:"Юрфак БашГУ (1989), к.ю.н., директор Института права БашГУ. Руководитель Администрации Президента РБ при Рахимове (2003–2008), замначальника Управления внутренней политики АП РФ (2009–2016), глава Красногорска (2017–2018), глава РБ с октября 2018. Переизбран 08.09.2024 с результатом 80,21%. Карьерный аппаратчик-политтехнолог.",
+    src:"ТАСС, РИА, Интерфакс, 09.09.2024"},
+   {n:"02",title:"Лидеры «его команды»: единая линия или векторы?",choice:"Единая линия + центры влияния",opts:["Жёсткая вертикаль без самостоятельных фигур","Единая линия + отдельные центры влияния","Разрозненные центры силы"],sel:1,
+    just:"Тандем Хабиров–Назаров устойчив (Назаров — премьер с 2020, бизнес-бэкграунд «Гранель»/«Деловая Россия», собственная инвестиционно-международная повестка). Но высокая кадровая турбулентность: вице-премьер Марзаев приговорён к 13 годам колонии (21.11.2025, взятка свыше 37 млн ₽); мэр Уфы Мавлиев арестован ФСБ 28.04.2026. Централизация и личный контроль главы усиливаются.",
+    src:"РБК-Уфа, Интерфакс, Коммерсантъ, 2024–2026"},
+   {n:"03",title:"Как транслирует долгосрочные цели развития?",choice:"Чёткое видение и миссия",opts:["Чёткое видение, образ «будущего региона» в выступлениях и документах","Набор плановых показателей без публичной концепции","Ситуативно — под федеральные проекты"],sel:0,
+    just:"Послание Госсобранию-Курултаю 12.12.2024: ВРП до 4 трлн ₽ и инвестиции до 1,25 трлн ₽ к 2030 году. Послание 30.01.2026: рамка «Цель — Победа, задача — развитие». Ежегодные послания, участие в 28 федпроектах / 11 нацпроектах. Видение структурировано, частично привязано к федеральной повестке.",
+    src:"Башинформ, 12.12.2024; 05.02.2026"},
+   {n:"04",title:"Позиционирование на федеральном и инвестиционном уровне",choice:"Очень активное",opts:["Активно участвует в форумах, формирует бренд и повестку региона","Фокус — исполнение поручений, позиционирование не в приоритете","Продвижение через партнёров, личное участие минимально"],sel:0,
+    just:"3-е место в Нацрейтинге инвестклимата АСИ по итогам 2023, 2024 и 2025 гг. (презентации на ПМЭФ). Инвестиции 2025 — 852,6 млрд ₽ (+1,7%). ОЭЗ «Алга» — самая динамичная в РФ. «Инвестчас»: 802 проекта на 1,4 трлн ₽ с 2018. Миссии: Китай (5 млрд ₽ в «Алгу»), Беларусь, Казахстан, ОАЭ (Дубай, 04.2025). МНБ-2024: 25 соглашений на 59 млрд ₽.",
+    src:"АСИ / Башинформ, 05.06.2026"},
+   {n:"05",title:"Стиль постановки задач",choice:"Жёсткий контроль + делегирование",opts:["Амбициозные цели, свобода в методах","Детальные поручения, сроки, KPI, контрольные точки","Делегирует замам, вмешивается при эскалации"],sel:1,
+    just:"Публичные разносы на понедельничных оперативках, детальные поручения со сроками (пример: отработать 1001 обращение с Прямой линии за 2 месяца), угрозы увольнений, контрольное управление с фотофиксацией исполнения. Операционка при этом делегирована Назарову. Оперативки проходят в ЦУР.",
+    src:"Prufy, glavarb.ru, 2024–2026"},
+   {n:"06",title:"Основной канал коммуникации с жителями",choice:"Смешанный подход",opts:["Публичные выступления, медиа и соцсети — формирование повестки","Приём граждан, разбор конкретных жалоб","Смешанный: стратегические коммуникации + системная работа с обращениями"],sel:2,
+    just:"Telegram-канал главы, ЦУР Башкортостана (18 информационных систем, «Инцидент-менеджмент» + Платформа обратной связи, ~5–6 тыс. обращений в неделю), Прямые линии, объезды муниципалитетов. После Баймака (январь 2024) усилена работа с инфополем и жалобами граждан.",
+    src:"pravitelstvorb.ru, 2025"},
+   {n:"07",title:"Фокус повседневного внимания",choice:"Баланс с креном в контроль",opts:["Инвестиции, новые проекты, партнёрства, кластеры","Контроль исполнения, сроки и качество (ЖКХ, дороги, соцобъекты)","Баланс между стратегией и операционкой"],sel:2,
+    just:"Контроль исполнения (дороги, ЖКХ, отопительные сезоны, ЧП — постоянные темы оперативок) сочетается с ярким инвестиционно-имиджевым вектором (ОЭЗ, БАС, форумы, туризм). После Баймака добавился фокус на безопасность.",
+    src:"glavarb.ru, оперативные совещания, 2025"},
+   {n:"08",title:"Публично озвучиваемые стратегические цели",choice:"Инвестиции + промышленность + БАС",opts:["Инвестиционная привлекательность, особые условия для бизнеса","Качественные дороги, комфортная городская среда","Высокий уровень медицины","Лидерство в туризме / образовании / БАС"],sel:0,
+    just:"Ранжирование по частоте: (1) инвестпривлекательность и промышленность/ОПК; (2) СВО и её экономическое обеспечение; (3) беспилотники — РБ на 3-м месте по «дронофикации», НПЦ БАС; (4) дороги и городская среда; (5) туризм — геопарки Торатау и Янгантау, единственные в РФ в сети ЮНЕСКО; (6) медицина и образование (кампус Евразийского НОЦ).",
+    src:"Башинформ, 01.09.2025; послания 2024–2026"},
+   {n:"09",title:"Критерии оценки успеха своей работы",choice:"Рейтинги + инвестиции + стабильность",opts:["Рост инвестиций, федеральное признание, позиционирование","Стабильность услуг, отсутствие аварий, выполнение планов","Сочетание стратегических и операционных показателей"],sel:2,
+    just:"Сочетание с приоритетом федерального признания: Нацрейтинг АСИ (3-е место три года подряд), рейтинг «Цифровая зрелость» Минцифры (РБ в числе лидеров — заявления Чернышенко/Григоренко, лето 2024), рост инвестиций. После Баймака критично отсутствие ЧП и недопущение негатива в федеральную повестку.",
+    src:"РБК, d-russia.ru, 2024–2025"},
+   {n:"10",title:"Распределение бюджетных приоритетов",choice:"Экономия + самоокупаемые модели",opts:["Инвестиции в развитие, маркетинг региона, кластеры","Текущее содержание, ремонты, поддержание инфраструктуры","Сбалансированный подход развитие/содержание"],sel:1,
+    just:"Растущее бюджетное давление: дефицит 2024 — 10 млрд ₽; 2025 — вырос с 4 до 9,8 млрд ₽; 2026 — 22,5 млрд ₽ при доходах 316,2 млрд, госдолг 86,9 млрд ₽. «Программа оздоровления финансов» по поручению федцентра, цель — бездефицитность к 2028. Вывод для поставщика: в приоритете экономия и модели без прямых бюджетных расходов (энергосервис, концессия, федсубсидии).",
+    src:"РБК-Уфа, 18.12.2025"}
+  ],
+  team:[
+   {fio:"Андрей Назаров",role:"Премьер-министр правительства РБ (с 2020)",dir:"Инвестиции, МСП, международка, КРТ",bg:"Бизнесмен («Гранель»), «Деловая Россия», родом из Баймака",vec:"unified",vecLabel:"Единая линия (с публичным весом)",digi:"Цифра как инструмент экономики; курирует повестку «Экономики данных»"},
+   {fio:"Рустам Муратов",role:"Первый вице-премьер, министр экономразвития и инвестполитики",dir:"Экономика, цифра, туризм, предпринимательство, ВЭС",bg:"Экономист-управленец; куратор Минцифры РБ",vec:"unified",vecLabel:"Единая линия",digi:"Ключевой владелец цифрового и инвестиционного направления"},
+   {fio:"Геннадий Разумикин",role:"Министр цифрового развития госуправления РБ",dir:"Цифровизация, ИИ, связь, ГосТех",bg:"Профильный ИТ-управленец, РЦТ региона",vec:"unified",vecLabel:"Единая линия",digi:"Драйвер: «Экономика данных», ИИ-платформа «Нейрошлюз», устранение цифрового неравенства (1286 населённых пунктов — рекорд РФ)"},
+   {fio:"Ирек Сагитов",role:"Вице-премьер",dir:"Спорт, ГК ЧС, юстиция",bg:"Управленец",vec:"unified",vecLabel:"Единая линия",digi:"Владелец темы безопасности → «Безопасный город», видеонаблюдение"},
+   {fio:"Александр Шельдяев",role:"Вице-премьер",dir:"Промышленность, энергетика, инновации; с 2026 — научно-технологическое развитие",bg:"Промышленный блок",vec:"unified",vecLabel:"Единая линия",digi:"Курирует БАС/беспилотники и инновации"},
+   {fio:"Ильшат Фазрахманов",role:"Вице-премьер — министр сельского хозяйства",dir:"АПК",bg:"Аграрный управленец",vec:"unified",vecLabel:"Единая линия",digi:"Цифровизация АПК («Цифровой улей»)"},
+   {fio:"Урал Кильсенбаев",role:"Первый вице-премьер",dir:"Внутриполитический и социальный блок",bg:"Аппаратный управленец",vec:"unified",vecLabel:"Единая линия",digi:"Умеренное отношение к цифре; фокус на внутренней политике"},
+   {fio:"Наталья Полянская",role:"Вице-премьер — минземимущество",dir:"Земля и имущество",bg:"Профильный управленец",vec:"unified",vecLabel:"Единая линия",digi:"Геоданные, цифровые кадастры"},
+   {fio:"Рустем Газизов",role:"Вице-премьер",dir:"Территориальное развитие",bg:"Экс-мэр Стерлитамака",vec:"unified",vecLabel:"Единая линия (новый)",digi:"Урбанистика, городская среда"},
+   {fio:"Искандер Ахметвалеев",role:"Руководитель администрации главы РБ",dir:"Внутренняя политика, аппарат",bg:"Аппаратчик; ключевая фигура постбаймакского контроля",vec:"unified",vecLabel:"Единая линия",digi:"ЦУР, работа с обращениями, инфополе"},
+   {fio:"Ратмир Мавлиев",role:"Мэр Уфы (2022 — апрель 2026)",dir:"Урбанистика, городская среда",bg:"Экс-мэр Нефтекамска, самый молодой мэр столицы региона. Арестован ФСБ 28.04.2026 (ч.6 ст.290 УК РФ)",vec:"own",vecLabel:"Свой вектор (выбыл)",digi:"Был драйвером: ситуационный центр Уфы, «Уфимское ожерелье», цифровизация города"},
+   {fio:"Сергей Нищев",role:"Гендиректор ПАО «Башинформсвязь» (с 29.01.2021)",dir:"Телеком, цифровые сервисы — партнёр-поставщик",bg:"Топ-менеджер группы Ростелеком",vec:"unified",vecLabel:"Партнёр-поставщик",digi:"Исполнитель: 609 комплексов фотовидеофиксации, более 48 тыс. светильников (энергосервис Уфы), школьная ИТ-инфраструктура, «Умный город»"}
+  ],
+  ratings:{
+    kpis:[
+      {val:"80,21",unit:"%",lbl:"Результат на выборах главы РБ, 08.09.2024"},
+      {val:"3",unit:"место",lbl:"Регион в Нацрейтинге инвестклимата АСИ — три года подряд (2023–2025)"},
+      {val:"14",unit:"место",lbl:"Рейтинг влияния АПЭК, дек. 2025 — группа «очень сильное влияние»"},
+      {val:"16",unit:"баллов",lbl:"«Госсовет 2.0» Минченко, июнь 2026 — «зелёная зона», топ-10"}
+    ],
+    series:[
+      {name:"АПЭК — рейтинг влияния глав субъектов РФ",sub:"Место среди 85+ глав; ниже = лучше. Экспертный опрос (23–26 экспертов), влияние на федеральном уровне",better:"lower",unit:"место",
+       points:[{t:"дек 24",v:18},{t:"янв 25",v:24},{t:"май 25",v:18},{t:"авг 25",v:16},{t:"ноя 25",v:16},{t:"дек 25",v:14}],
+       note:"Провал до 24-го места в январе 2025 (шлейф Баймака и антикоррупционных дел), затем устойчивое восстановление до 14-го — на фоне признания ОЭЗ «Алга» (топ-3 нацрейтинга ОЭЗ) и инвестиционной повестки. Возврат в группу «очень сильное влияние».",
+       src:"АПЭК / Коммерсантъ-Уфа, Правда ПФО, 2024–2026"},
+      {name:"«Госсовет 2.0» — политическая устойчивость (Минченко консалтинг)",sub:"Баллы по 9 критериям; выше = устойчивее. Зоны: красная <11, жёлтая 11–15, зелёная 16+",better:"higher",unit:"баллов",
+       points:[{t:"2020",v:12},{t:"сен 25",v:12},{t:"июн 26",v:16}],
+       note:"Переход из «жёлтой» в «зелёную» зону (XXII рейтинг, топ-10 губернаторов). Минченко: дело Мавлиева — не удар по Хабирову («исторически не из его команды»). Драйверы: международный трек (Таджикистан, Узбекистан), продолжительная устойчивость.",
+       src:"Минченко консалтинг / Башинформ, 02.06.2026"},
+      {name:"«ПУЛ» / The World Inform — KPI эффективности",sub:"ИИ-мониторинг медиа и общественной оценки; место среди 89 глав, ниже = лучше",better:"lower",unit:"место",
+       points:[{t:"2025 (ср.)",v:46},{t:"нач 26",v:47},{t:"вес 26",v:44}],
+       note:"Стабильная середина списка (KPI 46–47%): методика чувствительна к негативу в инфополе (уголовные дела в окружении), что оттягивает позицию вниз относительно экспертных рейтингов.",
+       src:"Проект «ПУЛ» / worldinform.ru, 2025–2026"},
+      {name:"Медиалогия — медиарейтинг глав регионов ПФО",sub:"Место в ПФО по МедиаИндексу; ниже = лучше",better:"lower",unit:"место в ПФО",
+       points:[{t:"2024 (ср.)",v:2},{t:"апр 25",v:2},{t:"2025 (ср.)",v:2}],
+       note:"Стабильно топ-3 ПФО (после Минниханова, наравне с Никитиным) — подтверждает профиль «публичного политика»: высокая личная медиаактивность, форумы, кампус НОЦ, культурные проекты.",
+       src:"Медиалогия, рейтинги губернаторов 2024–2025"}
+    ],
+    summary:"Динамика подтверждает классификацию «Лидер»: критерии успеха Хабирова — федеральное признание и позиции в рейтингах, и он системно их отыгрывает (восстановление АПЭК с 24-го до 14-го, выход в «зелёную зону» Минченко). Для поставщика это значит: проекты, дающие быстрый видимый федеральный эффект (рейтинг «Цифровая зрелость», ИКТ-кейсы для форумов, «Умный город»), попадают в личную мотивацию главы. Зона риска — чувствительность к негативу в инфополе: проекты «без скандалов» и с надёжным исполнением ценятся выше экспериментов."
+  },
+  intel:{
+    budget:{
+      cadence:"После утверждения + ежеквартальный мониторинг поправок",
+      year:2026, revenue:316.2, deficit:22.5, debt:86.9,
+      items:[
+        {name:"Доходы бюджета РБ 2026",v:316.2,max:316.2,acc:false},
+        {name:"Дефицит",v:22.5,max:316.2,acc:true},
+        {name:"Госдолг",v:86.9,max:316.2,acc:true}
+      ],
+      notes:"«Программа оздоровления финансов» по поручению федцентра, цель — бездефицитность к 2028. Вывод: прямые бюджетные ИТ-расходы под давлением → приоритет самоокупаемых моделей (энергосервис, концессия, аренда, федсубсидии). Мониторить: поправки в закон о бюджете (обычно апрель/июнь/октябрь), госпрограмму «Цифровое развитие РБ», лимиты Минцифры РБ.",
+      watch:["Закон о бюджете РБ + поправки (Курултай)","ГП «Развитие цифровой экономики РБ»","Лимиты по нацпроекту «Экономика данных»","ИБК / казначейские кредиты на инфраструктуру"]
+    },
+    procurement:{
+      cadence:"План-график — январь, далее ежемесячно по изменениям",
+      rows:[
+        {item:"Аренда комплексов ФВФ (609 ед., 62 муниципалитета)",gz:"Транспортная дирекция РБ",status:"won",note:"Действующий контракт БИС на 5 лет — отслеживать сроки пролонгации и расширения"},
+        {item:"Энергосервис уличного освещения Уфы (48 тыс. светильников)",gz:"Администрация Уфы / МУП",status:"won",note:"Контракт 8 лет — база для тиражирования в Стерлитамак, Салават, Нефтекамск"},
+        {item:"Каналы связи и VPN для органов власти РБ",gz:"Минцифры РБ / ГКУ",status:"open",note:"Ежегодная закупка — ключевая оборонительная позиция"},
+        {item:"Видеонаблюдение ЕГЭ/ОГЭ",gz:"Минпросвещения РБ",status:"open",note:"Ежегодная весенняя закупка, короткое окно"},
+        {item:"Wi-Fi и камеры в школах (5700 точек / 1700 камер)",gz:"Минцифры РБ (федсубсидия ~1 млрд ₽)",status:"won",note:"Исполнение — контроль SLA как референс для пролонгации"}
+      ]
+    },
+    recurring:{
+      cadence:"Реестр ежегодных закупок — ревизия раз в квартал",
+      rows:[
+        {item:"Техподдержка ситуационного центра / ЦУР",period:"ежегодно",status:"open",reason:"Уточнить текущего подрядчика и срок контракта",action:"Встреча с Минцифры РБ (Разумикин): аудит SLA, предложение единой платформы"},
+        {item:"Видеонаблюдение массовых мероприятий",period:"ежегодно (сезон)",status:"lost",reason:"Проигрыш по цене локальному интегратору (проверить)",action:"Разбор причин с закупщиком; пакетное предложение с видеоаналитикой"},
+        {item:"СКС и телефония больниц (Минздрав РБ)",period:"ежегодно",status:"lost",reason:"Дробление лотов по учреждениям",action:"Выйти на уровень министра: консолидированный контракт + телемедицина"}
+      ],
+      note:"Правило: по каждой проигранной периодической закупке — письменный разбор причин и коммуникация с заказчиком до следующего цикла, а не после публикации новой закупки."
+    },
+    media:{
+      cadence:"Еженедельный мониторинг + ежемесячная сводка",
+      signals:[
+        {heat:"hot",txt:"Акцент главы на ИИ: платформа «Нейрошлюз», риторика «регион-лидер по цифре» → продукты с ИИ-аналитикой (видеоаналитика, речевая аналитика ЦУР) попадают в личную повестку.",meta:"Минцифры РБ / выступления 2025–2026"},
+        {heat:"hot",txt:"Постбаймакский вектор: порядок подключения частных камер к региональной системе (01.2025) → консолидация видеонаблюдения = окно для платформы «Безопасный город».",meta:"Правительство РБ, январь 2025"},
+        {heat:"warm",txt:"Федеральный триггер: динамика смертности в ДТП — прямой аргумент к расширению ФВФ и освещения аварийных участков. Мониторить статистику ГИБДД по РБ ежеквартально: рост = повод для инициативного предложения.",meta:"Рейтинг безопасности дорог / ГИБДД"},
+        {heat:"warm",txt:"Цифровизация отраслей в риторике: образование (кампус НОЦ, школьная инфраструктура) и ЖКХ (аварийность — постоянная тема оперативок) упоминаются чаще медицины → порядок захода: образование → ЖКХ → медицина.",meta:"Контент-анализ оперативок 2024–2026"},
+        {heat:"warm",txt:"Рейтинг «Цифровая зрелость» Минцифры РФ — личный KPI главы (федеральное признание). Отставание по любой отрасли рейтинга = готовый повод для встречи с РЦТ.",meta:"Минцифры РФ, ежеквартально"}
+      ]
+    },
+    forums:{
+      cadence:"Календарь форумов — ПМЭФ (июнь), МНБ Уфа (октябрь), Иннопром (июль), KazanForum (май)",
+      deals:[
+        {deal:"Соглашения ПМЭФ-2026: подтверждение инвестповестки, ОЭЗ «Алга» (китайские резиденты, 5 млрд ₽)",signal:"Промышленные площадки растут",adjacent:"Связь и ЦОД для резидентов ОЭЗ, промышленный IoT, видеонаблюдение периметра"},
+        {deal:"МНБ-2024: 25 соглашений на 59 млрд ₽",signal:"Пиковое окно подписаний — октябрь",adjacent:"Готовить собственное соглашение БИС—Правительство РБ к МНБ: «Цифровой регион 2.0»"},
+        {deal:"Гипотетический кейс из методики: соглашение с Росатомом по ФВФ",signal:"Интерес к транспортной телематике",adjacent:"Предлагать смежное: весогабаритный контроль (ВГК), освещение дорог, метеомониторинг, ИТС-платформа"},
+        {deal:"Международный трек: Узбекистан, Таджикистан (2026)",signal:"Экспорт компетенций региона",adjacent:"Референс-продажи решений РБ («Безопасный город», ЦУР) в страны-партнёры через федеральный Ростелеком"}
+      ],
+      note:"Принцип: любое подписанное соглашение = сигнал интереса к тематике, даже если подписано с конкурентом. Реакция — предложение смежных продуктов в ту же тему в течение 2–4 недель после форума."
+    },
+    pains:{
+      cadence:"Ежемесячный срез ЦУР + просмотр правительственного часа",
+      rows:[
+        {pain:"ЖКХ: аварийность сетей, отопительные сезоны — топ жалоб в ЦУР (~5–6 тыс. обращений/нед. суммарно по всем темам)",solution:"Диспетчеризация котельных, IoT-датчики на сетях, аналитика инцидентов для вице-премьера по ЖКХ"},
+        {pain:"Дороги и транспорт: качество покрытия, освещение, общественный транспорт",solution:"Расширение ФВФ на аварийные участки, умное освещение (энергосервис), мониторинг общественного транспорта"},
+        {pain:"Медицина: доступность записи, очереди, кадровый дефицит в районах",solution:"Телемедицина районных больниц, речевая аналитика колл-центров, электронная очередь"},
+        {pain:"Связь в малых населённых пунктах (1286 подключено — рекорд РФ, но запрос сохраняется)",solution:"УЦН 2.0 — продолжение программы, политически выигрышная тема для главы"}
+      ],
+      note:"Источники: сводки ЦУР, «Инцидент-менеджмент», паблики муниципалитетов, отчёт главы перед Курултаем (правительственный час — февраль). Каждая устойчивая боль = слайд в CEO-презентации «как цифра снимает негатив»."
+    }
+  },
+  ict:[
+   {prod:"АПК «Безопасный город» / видеоаналитика",pri:"high",owner:"Ирек Сагитов + ГК ЧС",just:"Триггер: Баймак-2024 + режимные требования с 2022. РБ разработала порядок подключения частных камер (01.2025). Политически приоритетно лично для главы.",fin:"Бюджет РБ + федсубсидии"},
+   {prod:"Фотовидеофиксация нарушений ПДД",pri:"high",owner:"Минтранс / Транспортная дирекция РБ",just:"Доходы бюджета от штрафов + снижение ДТП. «Башинформсвязь» — действующий оператор: 609 комплексов в 62 муниципалитетах (аренда 5 лет). Конкуренты: НПО «ИТС», «Смартрегион».",fin:"Аренда / концессия / бюджет"},
+   {prod:"Энергосервис уличного освещения",pri:"high",owner:"Минстрой / блок ЖКХ",just:"Дефицит 22,5 млрд ₽ → самоокупаемость решает. «Башинформсвязь» — подрядчик в Уфе: более 48 тыс. светильников, контракт 8 лет.",fin:"Энергосервисный контракт (без расходов бюджета)"},
+   {prod:"Ситуационный центр главы / ЦУР",pri:"high",owner:"Администрация главы + Минцифры РБ",just:"Постбаймакская потребность в контроле, единое окно управления регионом. В ЦУР интегрировано 18 информационных систем.",fin:"Бюджет + федеральные платформы"},
+   {prod:"Работа с обращениями граждан (ЦУР, ПОС)",pri:"high",owner:"Администрация главы (И. Ахметвалеев)",just:"Постбаймакский фокус, KPI отклика населения. Через ЦУР проходит ~5–6 тыс. обращений в неделю.",fin:"Федеральные платформы + бюджет"},
+   {prod:"Цифровая образовательная среда",pri:"high",owner:"Минпросвещения РБ / Минцифры",just:"~1 млрд ₽ федерального финансирования (нацпроект «Экономика данных»). Ростелеком — исполнитель: 5700 точек Wi-Fi, 1700 камер в школах.",fin:"Федеральные субсидии"},
+   {prod:"Умное ЖКХ (диспетчеризация, счётчики)",pri:"mid",owner:"Минстрой / блок ЖКХ",just:"ЖКХ — топ жалоб в ЦУР; отопительные сезоны — постоянная тема оперативок.",fin:"Концессия / энергосервис / бюджет"},
+   {prod:"Умные дороги / ИТС",pri:"mid",owner:"Минтранс РБ",just:"Дороги — топ жалоб; развитие трассы М-12 и агломерационного каркаса.",fin:"Бюджет / ГЧП"},
+   {prod:"Беспилотники / БАС",pri:"mid",owner:"Александр Шельдяев / Минпром",just:"РБ — 3-е место по «дронофикации», НПЦ БАС, нацпроект по БАС. Имиджевая тема главы.",fin:"Федсубсидии / нацпроект"},
+   {prod:"Туризм (big data турпотока, сервисы)",pri:"mid",owner:"Госкомитет по туризму (кур. Муратов)",just:"Геопарки сети ЮНЕСКО, доходы от туризма 24 млрд ₽ (2025). Аналитика потоков по данным операторов — естественное преимущество телекома.",fin:"Бюджет / ГЧП"},
+   {prod:"Телемедицина",pri:"mid",owner:"Минздрав РБ",just:"Жалобы на доступность медпомощи; РБ в лидерах цифровизации здравоохранения.",fin:"Бюджет / федсубсидии"},
+   {prod:"Умное освещение (интеллектуальное управление)",pri:"mid",owner:"Муниципалитеты / ЖКХ",just:"Экономия, логичное продолжение энергосервиса; автоматизация в Мелеузе, Нефтекамске.",fin:"Энергосервис"}
+  ]
+},
+
+/* ---------- ЗАГЛУШКИ: демо-регионы для механики сравнения ---------- */
+{
+  id:"rt", name:"Рустам Минниханов", region:"Республика Татарстан", initials:"РМ",
+  isDemo:true, population:4004800, x:88, y:82,
+  classification:{label:"Лидер-технократ (демо)",hozLider:88,opStrat:82,polTech:35,
+    summary:"ДЕМО-ЗАГЛУШКА. Эталонный «Лидер-технократ»: 1-е место в Нацрейтинге АСИ, ИТ-кластер Иннополис, высокая цифровая зрелость. Заполняется реальными данными при исследовании региона."},
+  questions:demoQ("Лидер-технократ"),
+  team:[{fio:"(заглушка)",role:"Премьер-министр РТ",dir:"Экономика",bg:"Демо-данные",vec:"unified",vecLabel:"Единая линия",digi:"Высокий приоритет цифры"}],
+  ict:[{prod:"Суперсервисы / ИИ",pri:"high",owner:"Мининформсвязи РТ",just:"Демо: лидер по цифровой зрелости.",fin:"Бюджет + федсубсидии"},
+       {prod:"Умный город",pri:"high",owner:"(заглушка)",just:"Демо-данные.",fin:"Концессия"}]
+},
+{
+  id:"oren", name:"Евгений Солнцев", region:"Оренбургская область", initials:"ЕС",
+  isDemo:true, population:1842000, x:32, y:38,
+  classification:{label:"Хозяйственник (демо)",hozLider:32,opStrat:38,polTech:45,
+    summary:"ДЕМО-ЗАГЛУШКА. Тип «Хозяйственник»: стабильность, содержание инфраструктуры, экономия; ИТ как вспомогательный инструмент. Заполняется реальными данными при исследовании региона."},
+  questions:demoQ("Хозяйственник"),
+  team:[{fio:"(заглушка)",role:"Первый вице-губернатор",dir:"ЖКХ / инфраструктура",bg:"Демо-данные",vec:"unified",vecLabel:"Единая линия",digi:"Умеренное отношение к цифре"}],
+  ict:[{prod:"Цифровое ЖКХ",pri:"mid",owner:"(заглушка)",just:"Демо: приоритет содержания.",fin:"Бюджет"},
+       {prod:"Фотовидеофиксация ПДД",pri:"mid",owner:"(заглушка)",just:"Демо-данные.",fin:"Концессия"}]
+},
+{
+  id:"chel", name:"Алексей Текслер", region:"Челябинская область", initials:"АТ",
+  isDemo:true, population:3400000, x:72, y:68,
+  classification:{label:"Лидер-хозяйственник (демо)",hozLider:72,opStrat:68,polTech:55,
+    summary:"ДЕМО-ЗАГЛУШКА. Баланс лидерства и хозяйственности: в лидерах рейтинга цифровой зрелости, активная промышленная и городская повестка. Заполняется реальными данными при исследовании региона."},
+  questions:demoQ("Лидер-хозяйственник"),
+  team:[{fio:"(заглушка)",role:"Вице-губернатор по цифре",dir:"Цифровизация",bg:"Демо-данные",vec:"unified",vecLabel:"Единая линия",digi:"Высокий приоритет"}],
+  ict:[{prod:"Безопасный город",pri:"high",owner:"(заглушка)",just:"Демо: промышленный регион.",fin:"Бюджет + федсубсидии"},
+       {prod:"Умные дороги / ИТС",pri:"high",owner:"(заглушка)",just:"Демо-данные.",fin:"ГЧП"}]
+}
+];
+
+/* ============ РЕЕСТР СУБЪЕКТОВ РФ (89) — для добавления любого главы ============ */
+/* [название, население тыс. чел. (округлённо)] */
+const REGISTRY=[
+["Республика Адыгея",496],["Республика Алтай",210],["Республика Башкортостан",4046],["Республика Бурятия",974],
+["Республика Дагестан",3182],["Республика Ингушетия",527],["Кабардино-Балкарская Республика",905],["Республика Калмыкия",267],
+["Карачаево-Черкесская Республика",469],["Республика Карелия",527],["Республика Коми",726],["Республика Крым",1912],
+["Республика Марий Эл",672],["Республика Мордовия",769],["Республика Саха (Якутия)",997],["Республика Северная Осетия — Алания",687],
+["Республика Татарстан",4005],["Республика Тыва",337],["Удмуртская Республика",1442],["Республика Хакасия",528],
+["Чеченская Республика",1517],["Чувашская Республика",1173],["Алтайский край",2115],["Забайкальский край",984],
+["Камчатский край",288],["Краснодарский край",5839],["Красноярский край",2846],["Пермский край",2508],
+["Приморский край",1806],["Ставропольский край",2907],["Хабаровский край",1284],["Амурская область",750],
+["Архангельская область",1000],["Астраханская область",945],["Белгородская область",1509],["Брянская область",1132],
+["Владимирская область",1300],["Волгоградская область",2426],["Вологодская область",1128],["Воронежская область",2273],
+["Ивановская область",914],["Иркутская область",2330],["Калининградская область",1032],["Калужская область",1064],
+["Кемеровская область",2547],["Кировская область",1200],["Костромская область",566],["Курганская область",750],
+["Курская область",1052],["Ленинградская область",2036],["Липецкая область",1108],["Магаданская область",135],
+["Московская область",8652],["Мурманская область",656],["Нижегородская область",3037],["Новгородская область",568],
+["Новосибирская область",2789],["Омская область",1818],["Оренбургская область",1842],["Орловская область",690],
+["Пензенская область",1244],["Псковская область",580],["Ростовская область",4123],["Рязанская область",1063],
+["Самарская область",3105],["Саратовская область",2340],["Сахалинская область",461],["Свердловская область",4232],
+["Смоленская область",869],["Тамбовская область",950],["Тверская область",1194],["Томская область",1052],
+["Тульская область",1449],["Тюменская область",1622],["Ульяновская область",1167],["Челябинская область",3400],
+["Ярославская область",1187],["Москва",13150],["Санкт-Петербург",5601],["Севастополь",561],
+["Еврейская автономная область",147],["Ненецкий АО",42],["Ханты-Мансийский АО — Югра",1765],["Чукотский АО",48],
+["Ямало-Ненецкий АО",520],["Донецкая Народная Республика",2200],["Луганская Народная Республика",2100],
+["Запорожская область",700],["Херсонская область",500]
+];
+
+/* ============ БАЗОВЫЙ СЛОЙ: ВСЕ ГЛАВЫ СУБЪЕКТОВ РФ (июль 2026) ============
+   Уровень 1 (tier:"base"): ФИО, стартовая типология и позиция на осях — экспертная
+   оценка ИИ по открытым данным, требует верификации. Уровень 2 (полный профиль
+   как у Хабирова) добавляется отдельным исследованием региона через Импорт JSON.
+   Учтены ротации 2025–2026: врио Дагестана (Щукин, 04.2026), Белгородской (Шуваев)
+   и Брянской (Ковальчук) областей (05.2026), Тверской (Королёв, 11.2025). */
+const BASE_HEADS=[
+["Республика Адыгея","Мурат Кумпилов","МК",50,55,"Стабильный хозяйственник-политик"],
+["Республика Алтай","Андрей Турчак","АТ",70,65,"Политик федерального веса"],
+["Республика Бурятия","Алексей Цыденов","АЦ",68,63,"Лидер-технократ (транспорт)"],
+["Республика Дагестан","Фёдор Щукин (врио)","ФЩ",40,45,"Врио (судья), назначен 04.2026"],
+["Республика Ингушетия","Махмуд-Али Калиматов","МК",35,40,"Хозяйственник-силовик"],
+["Кабардино-Балкарская Республика","Казбек Коков","КК",45,50,"Хозяйственник-аппаратчик"],
+["Республика Калмыкия","Бату Хасиков","БХ",48,40,"Публичный политик"],
+["Карачаево-Черкесская Республика","Рашид Темрезов","РТ",40,45,"Хозяйственник-долгожитель"],
+["Республика Карелия","Артур Парфенчиков","АП",40,45,"Хозяйственник-силовик"],
+["Республика Коми","Ростислав Гольдштейн","РГ",50,50,"Политик-управленец"],
+["Республика Крым","Сергей Аксёнов","СА",55,48,"Политик-антикризисник"],
+["Республика Марий Эл","Юрий Зайцев","ЮЗ",42,46,"Хозяйственник-технократ"],
+["Республика Мордовия","Артём Здунов","АЗ",56,60,"Технократ-экономист"],
+["Республика Саха (Якутия)","Айсен Николаев","АН",80,75,"Лидер-технократ (ИТ-повестка)"],
+["Республика Северная Осетия — Алания","Сергей Меняйло","СМ",40,44,"Силовик-хозяйственник"],
+["Республика Тыва","Владислав Ховалыг","ВХ",32,40,"Хозяйственник"],
+["Удмуртская Республика","Александр Бречалов","АБ",58,54,"Публичный политик"],
+["Республика Хакасия","Валентин Коновалов","ВК",25,35,"Хозяйственник (КПРФ)"],
+["Чеченская Республика","Рамзан Кадыров","РК",60,42,"Политик-тяжеловес"],
+["Чувашская Республика","Олег Николаев","ОН",50,50,"Политик-управленец"],
+["Алтайский край","Виктор Томенко","ВТ",42,50,"Технократ-хозяйственник"],
+["Забайкальский край","Александр Осипов","АО",46,50,"Публичный антикризисник"],
+["Камчатский край","Владимир Солодов","ВС",70,70,"Лидер-технократ"],
+["Краснодарский край","Вениамин Кондратьев","ВК",52,46,"Хозяйственник-политик"],
+["Красноярский край","Михаил Котюков","МК",64,70,"Технократ-финансист"],
+["Пермский край","Дмитрий Махонин","ДМ",55,55,"Технократ"],
+["Приморский край","Олег Кожемяко","ОК",55,46,"Политик-антикризисник"],
+["Ставропольский край","Владимир Владимиров","ВВ",50,46,"Хозяйственник-политик"],
+["Хабаровский край","Дмитрий Демешин","ДД",46,46,"Силовик (экс-Генпрокуратура)"],
+["Амурская область","Василий Орлов","ВО",56,60,"Технократ (космодром, газохимия)"],
+["Архангельская область","Александр Цыбульский","АЦ",55,60,"Технократ"],
+["Астраханская область","Игорь Бабушкин","ИБ",45,45,"Силовик-хозяйственник"],
+["Белгородская область","Александр Шуваев (врио)","АШ",42,42,"Врио, Герой России («Время героев»)"],
+["Брянская область","Егор Ковальчук (врио)","ЕК",45,50,"Врио, управленец"],
+["Владимирская область","Александр Авдеев","АА",46,50,"Технократ"],
+["Волгоградская область","Андрей Бочаров","АБ",45,45,"Силовик-хозяйственник"],
+["Вологодская область","Георгий Филимонов","ГФ",58,45,"Публичный политик-идеолог"],
+["Воронежская область","Александр Гусев","АГ",42,50,"Хозяйственник"],
+["Ивановская область","Станислав Воскресенский","СВ",60,65,"Технократ-экономист"],
+["Иркутская область","Игорь Кобзев","ИК",45,46,"Силовик-хозяйственник (МЧС)"],
+["Калининградская область","Алексей Беспрозванных","АБ",55,55,"Технократ (Минпромторг)"],
+["Калужская область","Владислав Шапша","ВШ",60,60,"Технократ (инвестрегион)"],
+["Кемеровская область","Илья Середюк","ИС",46,50,"Хозяйственник-управленец"],
+["Кировская область","Александр Соколов","АС",46,50,"Политик-аппаратчик"],
+["Костромская область","Сергей Ситников","СС",32,40,"Хозяйственник-долгожитель"],
+["Курганская область","Вадим Шумков","ВШ",40,45,"Хозяйственник"],
+["Курская область","Александр Хинштейн","АХ",55,46,"Публичный политик-антикризисник"],
+["Ленинградская область","Александр Дрозденко","АД",64,60,"Лидер-хозяйственник"],
+["Липецкая область","Игорь Артамонов","ИА",56,56,"Технократ (экс-Сбербанк)"],
+["Магаданская область","Сергей Носов","СН",45,50,"Хозяйственник-производственник"],
+["Московская область","Андрей Воробьёв","АВ",85,75,"Лидер (цифровая витрина)"],
+["Мурманская область","Андрей Чибис","АЧ",70,70,"Лидер-технократ"],
+["Нижегородская область","Глеб Никитин","ГН",85,80,"Лидер-технократ (ИТ-кластер)"],
+["Новгородская область","Александр Дронов","АД",50,55,"Технократ (дороги)"],
+["Новосибирская область","Андрей Травников","АТ",55,60,"Технократ"],
+["Омская область","Виталий Хоценко","ВХ",55,55,"Технократ (промышленность)"],
+["Орловская область","Андрей Клычков","АК",40,45,"Политик (КПРФ)"],
+["Пензенская область","Олег Мельниченко","ОМ",45,50,"Аппаратчик-хозяйственник"],
+["Псковская область","Михаил Ведерников","МВ",45,50,"Аппаратчик"],
+["Ростовская область","Юрий Слюсарь","ЮС",60,65,"Технократ-промышленник (экс-ОАК)"],
+["Рязанская область","Павел Малков","ПМ",56,60,"Технократ-цифровик (экс-Росстат)"],
+["Самарская область","Вячеслав Федорищев","ВФ",55,50,"Публичный технократ"],
+["Саратовская область","Роман Бусаргин","РБ",40,45,"Хозяйственник"],
+["Сахалинская область","Валерий Лимаренко","ВЛ",70,65,"Лидер-технократ"],
+["Свердловская область","Денис Паслер","ДП",50,50,"Хозяйственник-энергетик"],
+["Смоленская область","Василий Анохин","ВА",50,55,"Технократ"],
+["Тамбовская область","Евгений Первышов","ЕП",46,50,"Управленец («Время героев»)"],
+["Тверская область","Виталий Королёв (врио)","ВК",50,55,"Врио, технократ (экс-ФАС)"],
+["Томская область","Владимир Мазур","ВМ",45,50,"Аппаратчик"],
+["Тульская область","Дмитрий Миляев","ДМ",46,50,"Хозяйственник"],
+["Тюменская область","Александр Моор","АМ",65,60,"Лидер-хозяйственник"],
+["Ульяновская область","Алексей Русских","АР",40,45,"Хозяйственник (КПРФ)"],
+["Ярославская область","Михаил Евраев","МЕ",55,55,"Технократ-цифровик (экс-Минцифры/ФАС)"],
+["Москва","Сергей Собянин","СС",95,85,"Лидер №1 (эталон цифровизации)"],
+["Санкт-Петербург","Александр Беглов","АБ",45,42,"Хозяйственник"],
+["Севастополь","Михаил Развожаев","МР",55,50,"Публичный политик"],
+["Еврейская автономная область","Мария Костюк","МК",46,50,"Управленец"],
+["Ненецкий АО","Ирина Гехт","ИГ",45,50,"Управленец"],
+["Ханты-Мансийский АО — Югра","Руслан Кухарук","РК",66,60,"Лидер-управленец (рост в рейтингах)"],
+["Чукотский АО","Владислав Кузнецов","ВК",45,50,"Технократ"],
+["Ямало-Ненецкий АО","Дмитрий Артюхов","ДА",80,75,"Лидер-технократ (цифра)"],
+["Донецкая Народная Республика","Денис Пушилин","ДП",40,35,"Политик военного времени"],
+["Луганская Народная Республика","Леонид Пасечник","ЛП",35,35,"Политик военного времени"],
+["Запорожская область","Евгений Балицкий","ЕБ",35,35,"Политик военного времени"],
+["Херсонская область","Владимир Сальдо","ВС",35,35,"Хозяйственник военного времени"]
+];
+
+/* Разворачиваем базовый слой в единую структуру REGIONS */
+BASE_HEADS.forEach(function(b){
+  if(REGIONS.some(function(r){return r.region===b[0];}))return; // полные/демо профили не трогаем
+  var reg=REGISTRY.find(function(x){return x[0]===b[0];});
+  REGIONS.push({
+    id:"b_"+b[0].replace(/[^а-яА-ЯёЁa-zA-Z]/g,"").slice(0,12), name:b[1], region:b[0],
+    initials:b[2], isDemo:true, tier:"base", population:(reg?reg[1]:500)*1000,
+    x:b[3], y:b[4], lastUpdated:null,
+    classification:{label:b[5]+" · базовый профиль",hozLider:b[3],opStrat:b[4],polTech:50,
+      summary:"Базовый слой (уровень 1): ФИО, типология и стартовая позиция на осях — экспертная оценка по открытым данным на июль 2026, требует верификации. Полный профиль по 10 вопросам методики, команде, ИКТ-карте и радару продаж (уровень 2) добавляется отдельным исследованием региона — как это сделано для Башкортостана — и загружается через «Импорт JSON» или дозаполняется кнопками ИИ-обновления."},
+    questions:demoQ("базовый профиль"),statements:[],ratings:null,intel:null,
+    team:[{fio:"(заполняется исследованием)",role:"—",dir:"—",bg:"Уровень 2 — глубокое исследование региона",vec:"unified",vecLabel:"—",digi:"—"}],
+    ict:[{prod:"(заполняется исследованием)",pri:"mid",owner:"—",just:"Уровень 2 — глубокое исследование региона.",fin:"—"}]
+  });
+});
+
+/* ============ ФАЗА 0: КОНФИГ, ФО, КАТАЛОГ ПРОДУКТОВ, ДВИЖОК СВЕЖЕСТИ ============ */
+const CONFIG={
+  /* Внешний источник данных. Порядок попыток: относительный путь (когда HTML и
+     regions.json лежат рядом на GitHub Pages / Railway), затем абсолютный RAW-URL
+     (чтобы локально открытый файл тоже тянул свежие данные из репозитория).
+     После переезда в закрытый контур меняется только этот блок. */
+  DATA_URLS:[
+    "regions.json",
+    "" /* сюда вписать https://raw.githubusercontent.com/<user>/<repo>/main/regions.json */
+  ],
+  AUTO_CHECK_ON_LOAD:true,      /* проверять регламенты свежести при загрузке */
+  /* Регламенты обновления разделов, в днях (из целеполагания ЦР v1.1) */
+  CADENCE:{profile:90, team:90, ratings:30, statements:7, ict:90, radar:30, svod:365}
+};
+const CADENCE_LABEL={profile:"Профиль главы",team:"Команда",ratings:"Рейтинги",statements:"Высказывания",ict:"Интересы в ИКТ",radar:"Радар продаж",svod:"Сводный рейтинг"};
+
+/* Федеральные округа (для фильтра сравнения и будущих прогонов research) */
+const FO_MAP={
+ "ПФО":["Республика Башкортостан","Республика Татарстан","Удмуртская Республика","Чувашская Республика","Республика Марий Эл","Республика Мордовия","Пермский край","Кировская область","Нижегородская область","Оренбургская область","Пензенская область","Самарская область","Саратовская область","Ульяновская область"],
+ "ЦФО":["Москва","Московская область","Белгородская область","Брянская область","Владимирская область","Воронежская область","Ивановская область","Калужская область","Костромская область","Курская область","Липецкая область","Орловская область","Рязанская область","Смоленская область","Тамбовская область","Тверская область","Тульская область","Ярославская область"],
+ "СЗФО":["Санкт-Петербург","Ленинградская область","Архангельская область","Вологодская область","Калининградская область","Республика Карелия","Республика Коми","Мурманская область","Ненецкий АО","Новгородская область","Псковская область"],
+ "ЮФО":["Республика Адыгея","Астраханская область","Волгоградская область","Республика Калмыкия","Краснодарский край","Республика Крым","Ростовская область","Севастополь","Донецкая Народная Республика","Луганская Народная Республика","Запорожская область","Херсонская область"],
+ "СКФО":["Республика Дагестан","Республика Ингушетия","Кабардино-Балкарская Республика","Карачаево-Черкесская Республика","Республика Северная Осетия — Алания","Ставропольский край","Чеченская Республика"],
+ "УФО":["Курганская область","Свердловская область","Тюменская область","Ханты-Мансийский АО — Югра","Челябинская область","Ямало-Ненецкий АО"],
+ "СФО":["Республика Алтай","Алтайский край","Иркутская область","Кемеровская область","Красноярский край","Новосибирская область","Омская область","Томская область","Республика Тыва","Республика Хакасия"],
+ "ДФО":["Амурская область","Республика Бурятия","Еврейская автономная область","Забайкальский край","Камчатский край","Магаданская область","Приморский край","Республика Саха (Якутия)","Сахалинская область","Хабаровский край","Чукотский АО"]
+};
+REGIONS.forEach(function(r){
+  for(var fo in FO_MAP){ if(FO_MAP[fo].indexOf(r.region)>=0){r.fo=fo;return;} }
+  r.fo="—";
+});
+
+/* Полная номенклатура продуктов «Цифровых регионов» (расширение из целеполагания v1.1).
+   Продукты, не оценённые для региона, показываются в ИКТ-вкладке как «к проработке». */
+const PRODUCT_CATALOG=[
+ "АПК «Безопасный город» / видеоаналитика","Фотовидеофиксация нарушений ПДД","Энергосервис уличного освещения",
+ "Ситуационный центр главы / ЦУР","Работа с обращениями граждан (ЦУР, ПОС)","Цифровая образовательная среда",
+ "Умное ЖКХ (диспетчеризация, счётчики)","Умные дороги / ИТС","Беспилотники / БАС","Туризм (big data турпотока, сервисы)",
+ "Телемедицина","Умное освещение (интеллектуальное управление)",
+ "Умные дороги / АПВГК","Система 112","Системы оповещения и мониторинга","Транспортная безопасность",
+ "Цифровые / блочно-модульные котельные","Энергоцентры","Энергоэффективное отопление (САРТ)",
+ "Водоснабжение, водоотведение и водоподготовка","Цифровые двойники","Государственные информационные системы (ГИС)",
+ "Обследование МКД","Экология","ЦОД"
+];
+
+/* Движок свежести: дата последнего обновления раздела vs регламент CADENCE */
+function sectionUpdatedAt(r,sec){
+  return (r.updatedAt&&r.updatedAt[sec])||r.lastUpdated||null;
+}
+function markUpdated(r,secs){
+  r.updatedAt=r.updatedAt||{};
+  var d=new Date().toISOString().slice(0,10);
+  secs.forEach(function(s){r.updatedAt[s]=d;});
+  r.lastUpdated=d;
+}
+function dueSections(r){
+  var out=[];
+  for(var sec in CONFIG.CADENCE){
+    if(sec==="radar"&&!r.intel)continue;
+    if(sec==="ratings"&&!r.ratings)continue;
+    if(sec==="svod")continue; /* раздел появится в Фазе 2 */
+    var d=daysSince(sectionUpdatedAt(r,sec));
+    if(d>CONFIG.CADENCE[sec])out.push({sec:sec,days:d===Infinity?null:d,limit:CONFIG.CADENCE[sec]});
+  }
+  return out;
+}
+function staleBannerHtml(r){
+  if(!CONFIG.AUTO_CHECK_ON_LOAD)return "";
+  var due=dueSections(r);
+  if(!due.length)return "";
+  var names=due.map(function(x){return CADENCE_LABEL[x.sec]+" ("+(x.days===null?"нет данных":"просрочено на "+(x.days-x.limit)+" дн.")+")";}).join("; ");
+  return '<div class="banner">⚠ По регламенту требуют обновления: '+esc(names)+'. Нажмите «Обновить данные (ИИ)» или дождитесь ночного обновления regions.json ботом.</div>';
+}
+
+/* Загрузка данных из внешнего источника (GitHub Pages / Railway / закрытый контур) */
+var DATA_SOURCE="встроенные данные";
+function applyRemote(arr){
+  if(!Array.isArray(arr)||!arr.length)throw new Error("не массив");
+  REGIONS.length=0;arr.forEach(function(x){REGIONS.push(x);});
+  REGIONS.forEach(function(r){ if(!r.fo){for(var fo in FO_MAP){if(FO_MAP[fo].indexOf(r.region)>=0){r.fo=fo;break;}} r.fo=r.fo||"—";} });
+  DATA_SOURCE="внешний источник";
+}
+async function loadRemoteData(extraUrl){
+  var urls=(extraUrl?[extraUrl]:[]).concat(CONFIG.DATA_URLS);
+  for(var i=0;i<urls.length;i++){
+    var u=urls[i]; if(!u)continue;
+    try{
+      var resp=await fetch(u+(u.indexOf("?")<0?"?v="+Date.now():""),{cache:"no-store"});
+      if(!resp.ok)continue;
+      applyRemote(await resp.json());
+      return u;
+    }catch(e){/* file:// или сеть недоступна — используем встроенные данные */}
+  }
+  return null;
+}
+
+/* Кнопка «Обновить из интернета»: мгновенная подтяжка свежего regions.json.
+   Не требует ключей — данные публикует бот update_bot.py в репозитории. */
+async function refreshFromInternet(){
+  const btn=document.getElementById('btnPull');
+  const prevRegion=cur?cur.region:null;
+  btn.disabled=true;const old=btn.innerHTML;btn.innerHTML='<span class="spinner"></span> Загрузка...';
+  let src=await loadRemoteData();
+  btn.disabled=false;btn.innerHTML=old;
+  if(src){
+    buildSelector();
+    const idx=Math.max(0,REGIONS.findIndex(r=>r.region===prevRegion));
+    sel.value=idx;cur=REGIONS[idx];
+    renderAll();
+    const latest=REGIONS.reduce((m,r)=>r.lastUpdated&&r.lastUpdated>m?r.lastUpdated:m,"");
+    openModal('<h3>Данные обновлены</h3><p>Загружено регионов: <b>'+REGIONS.length+'</b>. Самое свежее обновление в данных: <b>'+(latest||"—")+'</b>.<br>Источник: <span style="font-family:monospace;font-size:12px">'+esc(src)+'</span></p>'+
+      '<div class="row"><button class="tb-btn accent" onclick="closeModal()">Готово</button></div>');
+  }else{
+    openModal('<h3>Источник данных не настроен или недоступен</h3>'+
+      '<p>Файл не смог получить <b>regions.json</b>. Причины: (а) в CONFIG.DATA_URLS ещё не вписан адрес репозитория; (б) нет сети; (в) файл открыт локально, а адрес не задан.</p>'+
+      '<p>Вставьте прямой URL файла данных (например,<br><span style="font-family:monospace;font-size:12px">https://raw.githubusercontent.com/&lt;user&gt;/&lt;repo&gt;/main/regions.json</span>):</p>'+
+      '<textarea id="pullUrl" style="min-height:52px" placeholder="https://..."></textarea>'+
+      '<div class="row"><button class="tb-btn ghost" onclick="closeModal()">Отмена</button>'+
+      '<button class="tb-btn accent" id="goPull">Загрузить</button></div>');
+    document.getElementById('goPull').onclick=async function(){
+      const u=document.getElementById('pullUrl').value.trim();
+      if(!u)return;
+      this.disabled=true;this.innerHTML='<span class="spinner"></span>';
+      const got=await loadRemoteData(u);
+      if(got){
+        if(CONFIG.DATA_URLS.indexOf(u)<0)CONFIG.DATA_URLS.unshift(u); /* запомнить на сессию */
+        buildSelector();cur=REGIONS[0];sel.value=0;renderAll();closeModal();
+        setTimeout(()=>openModal('<h3>Данные обновлены</h3><p>Загружено регионов: <b>'+REGIONS.length+'</b>.</p><p style="font-size:12.5px;color:#7A8294">Чтобы кнопка работала в один клик у всех, кто скачал файл, впишите этот URL постоянным вторым элементом в CONFIG.DATA_URLS в начале &lt;script&gt; файла.</p><div class="row"><button class="tb-btn accent" onclick="closeModal()">Готово</button></div>'),50);
+      }else{
+        this.disabled=false;this.textContent="Загрузить";
+        alert("Не удалось загрузить по этому URL. Проверьте адрес и доступность файла.");
+      }
+    };
+  }
+}
+
+/* ============ ОНЛАЙН-СЛОЙ: ИИ-обновление, добавление регионов, экспорт ============ */
+const API_URL="https://api.anthropic.com/v1/messages";
+const STALE_DAYS=30;
+
+function daysSince(iso){ if(!iso)return Infinity; return Math.floor((Date.now()-new Date(iso).getTime())/86400000); }
+
+async function askClaude(prompt,useSearch){
+  const body={model:"claude-sonnet-4-6",max_tokens:1000,
+    messages:[{role:"user",content:prompt}]};
+  if(useSearch)body.tools=[{type:"web_search_20250305",name:"web_search"}];
+  const resp=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!resp.ok)throw new Error("API "+resp.status+" — файл должен быть открыт как артефакт в Claude.ai (локально нужен API-ключ)");
+  const data=await resp.json();
+  return (data.content||[]).filter(i=>i.type==="text").map(i=>i.text).join("\n");
+}
+function parseJSON(text){
+  const clean=text.replace(/```json|```/g,"").trim();
+  const s=clean.indexOf("{"),e=clean.lastIndexOf("}");
+  if(s<0||e<0)throw new Error("В ответе не найден JSON");
+  return JSON.parse(clean.substring(s,e+1));
+}
+
+const modalBg=document.getElementById('modalBg'),modalBox=document.getElementById('modalBox');
+function openModal(html){modalBox.innerHTML=html;modalBg.classList.add('show');}
+function closeModal(){modalBg.classList.remove('show');}
+modalBg.addEventListener('click',e=>{if(e.target===modalBg)closeModal();});
+
+function logLine(msg){const el=document.getElementById('ailog');if(el){el.textContent+=msg+"\n";el.scrollTop=el.scrollHeight;}}
+
+/* --- Ежемесячное обновление выбранного региона --- */
+async function updateRegion(){
+  const r=cur;
+  openModal('<h3>Обновление данных: '+esc(r.region)+'</h3>'+
+    '<p>ИИ-поиск свежих позиций в рейтингах (АПЭК, «Госсовет 2.0») и ключевых высказываний главы за последние 30–60 дней. Рекомендуемый ритм — раз в месяц.</p>'+
+    '<div class="log" id="ailog"></div>'+
+    '<div class="row"><button class="tb-btn ghost" onclick="closeModal()">Закрыть</button>'+
+    '<button class="tb-btn accent" id="goUpd">Запустить поиск</button></div>');
+  document.getElementById('goUpd').onclick=async function(){
+    this.disabled=true;this.innerHTML='<span class="spinner"></span> Поиск...';
+    try{
+      logLine("→ Запрос 1/2: рейтинги...");
+      const p1='Найди актуальные на сегодня позиции главы региона «'+r.region+'» ('+r.name+') в рейтинге влияния АПЭК (место) и рейтинге устойчивости «Госсовет 2.0» Минченко (баллы). Ответь ТОЛЬКО JSON без пояснений и markdown: {"apek":{"t":"мес гг","v":число}|null,"minchenko":{"t":"мес гг","v":число}|null}';
+      const j1=parseJSON(await askClaude(p1,true));
+      if(j1.apek&&r.ratings){const s=r.ratings.series.find(x=>x.name.indexOf("АПЭК")>=0);if(s&&s.points[s.points.length-1].v!==j1.apek.v){s.points.push(j1.apek);logLine("✓ АПЭК: "+j1.apek.v+" ("+j1.apek.t+")");}else logLine("· АПЭК: без изменений");}
+      if(j1.minchenko&&r.ratings){const s=r.ratings.series.find(x=>x.name.indexOf("Госсовет")>=0);if(s&&s.points[s.points.length-1].v!==j1.minchenko.v){s.points.push(j1.minchenko);logLine("✓ Минченко: "+j1.minchenko.v);}else logLine("· Минченко: без изменений");}
+      logLine("→ Запрос 2/2: высказывания...");
+      const p2='Найди 2-3 ключевых публичных высказывания/решения главы региона «'+r.region+'» ('+r.name+') за последние 60 дней по темам: стратегия, инвестиции, цифровизация, безопасность, бюджет. Ответь ТОЛЬКО JSON: {"items":[{"d":"ГГГГ-ММ","tag":"тема","txt":"суть в 1-2 предложениях своими словами","src":"источник, дата"}]}';
+      const j2=parseJSON(await askClaude(p2,true));
+      if(j2.items&&j2.items.length){r.statements=[...j2.items,...(r.statements||[])];logLine("✓ Добавлено высказываний: "+j2.items.length);}
+      markUpdated(r,['ratings','statements']);
+      renderAll();renderFreshness();
+      logLine("Готово. Не забудьте «Экспорт JSON», чтобы сохранить обновление в файл.");
+    }catch(e){logLine("✗ Ошибка: "+e.message);}
+    this.disabled=false;this.textContent="Запустить ещё раз";
+  };
+}
+
+/* --- Верификация/переоценка главы региона (все 89 уже в базе) --- */
+async function addRegion(){
+  const opts=REGIONS.map((r,i)=>'<option value="'+i+'"'+(r===cur?' selected':'')+'>'+esc(r.region)+' — '+esc(r.name)+(r.tier==="base"?' · база':'')+'</option>').join('');
+  openModal('<h3>Верифицировать главу региона (ИИ)</h3>'+
+    '<p>Все 89 субъектов уже в базе. Эта функция проверяет актуальность главы через веб-поиск (ротации, врио) и переоценивает позицию на осях. Полезно после «губернаторопадов» — весна и осень.</p>'+
+    '<select id="regPick">'+opts+'</select>'+
+    '<div class="log" id="ailog"></div>'+
+    '<div class="row"><button class="tb-btn ghost" onclick="closeModal()">Закрыть</button>'+
+    '<button class="tb-btn accent" id="goAdd">Проверить и обновить</button></div>');
+  document.getElementById('goAdd').onclick=async function(){
+    this.disabled=true;this.innerHTML='<span class="spinner"></span> Проверка...';
+    const idx=+document.getElementById('regPick').value;
+    const t=REGIONS[idx];
+    try{
+      logLine("→ Проверка главы региона «"+t.region+"»...");
+      const p='Кто сейчас (на текущую дату) глава региона «'+t.region+'» (Россия)? Если недавно сменился — укажи нового/врио. Оцени по осям: X «Хозяйственник(0)—Лидер(100)», Y «Операционщик(0)—Стратег(100)». Ответь ТОЛЬКО JSON: {"fio":"Имя Фамилия","initials":"ИФ","changed":true|false,"x":число,"y":число,"label":"тип в 2-4 словах","summary":"обоснование 2-3 предложения с фактами"}';
+      const j=parseJSON(await askClaude(p,true));
+      if(j.changed||j.fio!==t.name){logLine("⚠ Смена главы: "+t.name+" → "+j.fio);}
+      t.name=j.fio;t.initials=j.initials||t.initials;t.x=j.x;t.y=j.y;
+      t.classification.hozLider=j.x;t.classification.opStrat=j.y;
+      t.classification.label=j.label+" · верифицировано ИИ";
+      t.classification.summary=j.summary+" — Верифицировано ИИ-поиском "+new Date().toISOString().slice(0,10)+"; для уровня 2 требуется полное исследование региона.";
+      markUpdated(t,['profile','team']);
+      sel.options[idx].textContent=t.region+" — "+t.name+(t.isDemo?" · демо":"");
+      if(t===cur)renderAll();
+      logLine("✓ Обновлено: "+j.fio+" ("+j.label+"), x="+j.x+", y="+j.y);
+      logLine("«Экспорт JSON» — чтобы сохранить в файл.");
+    }catch(e){logLine("✗ Ошибка: "+e.message);}
+    this.disabled=false;this.textContent="Проверить ещё регион";
+  };
+}
+
+/* --- Экспорт/импорт данных (персистентность без сервера) --- */
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(REGIONS,null,1)],{type:"application/json"});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download="regions-data-"+new Date().toISOString().slice(0,10)+".json";a.click();
+}
+function importJSON(){
+  openModal('<h3>Импорт данных</h3><p>Вставьте JSON, ранее выгруженный кнопкой «Экспорт» (или отредактированный вручную). Массив полностью заменит текущие данные регионов.</p>'+
+    '<textarea id="impArea" placeholder="[ { ... } ]"></textarea>'+
+    '<div class="row"><button class="tb-btn ghost" onclick="closeModal()">Отмена</button>'+
+    '<button class="tb-btn accent" id="goImp">Импортировать</button></div>');
+  document.getElementById('goImp').onclick=function(){
+    try{
+      const arr=JSON.parse(document.getElementById('impArea').value);
+      if(!Array.isArray(arr)||!arr.length)throw new Error("Ожидается непустой массив");
+      REGIONS.length=0;arr.forEach(x=>REGIONS.push(x));
+      sel.innerHTML="";REGIONS.forEach((r,i)=>{const o=document.createElement('option');o.value=i;o.textContent=r.region+" — "+r.name+(r.isDemo?" · демо":"");sel.appendChild(o);});
+      cur=REGIONS[0];sel.value=0;renderAll();renderFreshness();closeModal();
+    }catch(e){alert("Ошибка импорта: "+e.message);}
+  };
+}
+
+function renderFreshness(){
+  const el=document.getElementById('freshness');
+  const due=dueSections(cur);
+  const d=daysSince(cur.lastUpdated);
+  let src=' · источник: '+DATA_SOURCE;
+  if(!cur.lastUpdated){el.className="fresh stale";el.innerHTML="Обновлений не было — <b>нажмите «Обновить»</b>"+src;return;}
+  el.className="fresh"+(due.length?" stale":"");
+  el.innerHTML="Обновлено: <b>"+cur.lastUpdated+"</b>"+(due.length?" · <b>по регламенту устарело: "+due.length+" разд.</b>":" · актуально")+src;
+}
+
+/* --- Лента высказываний --- */
+let stmtFilter="Все";
+function renderStatements(){
+  const r=cur,el=document.getElementById('statements');
+  const items=r.statements||[];
+  let h='<div class="card"><h3>Высказывания и решения главы за два года — '+esc(r.name)+'</h3>';
+  if(daysSince(r.lastUpdated)>STALE_DAYS)h+='<div class="banner">⚠ Данные старше '+STALE_DAYS+' дней. Нажмите «Обновить данные (ИИ)» в панели сверху — лента пополнится свежими высказываниями и рейтингами.</div>';
+  if(!items.length){h+='<div class="note">Лента пуста (демо-регион или новый черновик). Заполняется исследованием или кнопкой «Обновить данные (ИИ)».</div></div>';el.innerHTML=h;return;}
+  const tags=["Все",...new Set(items.map(s=>s.tag))];
+  h+='<div class="chips">'+tags.map(t=>'<button class="chip'+(t===stmtFilter?' on':'')+'" onclick="stmtFilter=\''+esc(t)+'\';renderStatements()">'+esc(t)+'</button>').join('')+'</div>';
+  const list=items.filter(s=>stmtFilter==="Все"||s.tag===stmtFilter)
+    .slice().sort((a,b)=>b.d.localeCompare(a.d));
+  list.forEach(s=>{
+    h+='<div class="stmt"><div class="stmt-date">'+esc(s.d)+'</div><div class="stmt-body">'+
+      '<div class="txt"><span class="stmt-tag">'+esc(s.tag)+'</span>'+esc(s.txt)+'</div>'+
+      '<div class="meta">Источник: '+esc(s.src)+'</div></div></div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+document.getElementById('btnPull').addEventListener('click',refreshFromInternet);
+document.getElementById('btnUpdate').addEventListener('click',updateRegion);
+document.getElementById('btnAddRegion').addEventListener('click',addRegion);
+document.getElementById('btnExport').addEventListener('click',exportJSON);
+document.getElementById('btnImport').addEventListener('click',importJSON);
+
+/* ============================ ПРЕДСТАВЛЕНИЕ ============================ */
+let cur = REGIONS[0];
+const sel = document.getElementById('regSel');
+function buildSelector(){
+  sel.innerHTML="";
+  REGIONS.forEach((r,i)=>{const o=document.createElement('option');o.value=i;o.textContent=r.region+" — "+r.name+(r.isDemo?(r.tier==="base"?" · база":" · демо"):"");sel.appendChild(o);});
+}
+sel.addEventListener('change',()=>{cur=REGIONS[sel.value];renderAll();});
+
+document.querySelectorAll('nav button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.tab).classList.add('active');
+    if(b.dataset.tab==='compare') renderCompare();
+  });
+});
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function scaleHtml(l,r,v){
+  return '<div class="scale-wrap"><div class="scale-label"><span>'+l+' · 0</span><span>'+r+' · 100</span></div>'+
+    '<div class="scale"><div class="scale-marker" style="left:calc('+v+'% - 4px)"></div></div>'+
+    '<div class="scale-val">'+v+' / 100</div></div>';
+}
+
+function renderProfile(){
+  const r=cur;
+  let h=staleBannerHtml(r);
+  h+='<div class="hero">'+
+    '<div class="avatar">'+esc(r.initials)+'</div>'+
+    '<div class="hero-info"><h2>'+esc(r.name)+
+    (r.isDemo?'<span class="badge demo">демо-данные</span>':'<span class="badge">реальные данные</span>')+
+    '</h2><div class="sub">'+esc(r.region)+' · Население: '+r.population.toLocaleString('ru-RU')+' чел.</div></div></div>';
+
+  h+='<div class="card"><h3>Итоговая классификация</h3>'+
+    '<div class="class-label">'+esc(r.classification.label)+'</div>'+
+    '<div class="class-summary">'+esc(r.classification.summary)+'</div>'+
+    scaleHtml("Хозяйственник","Лидер",r.classification.hozLider)+
+    scaleHtml("Операционщик","Стратег",r.classification.opStrat)+
+    scaleHtml("Технократ","Публичный политик",r.classification.polTech)+
+    '</div>';
+
+  h+='<div class="card"><h3>Опросник по методике «Классификация заказчика в регионе» — 10 вопросов</h3>'+
+     '<div class="note" style="margin-bottom:14px">Клик по вопросу раскрывает варианты ответа и обоснование с источниками.</div>';
+  r.questions.forEach((q)=>{
+    h+='<div class="q">'+
+      '<div class="q-head" onclick="this.parentElement.classList.toggle(\'open\')" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();this.parentElement.classList.toggle(\'open\')}">'+
+        '<div class="q-head-left"><span class="q-num">'+esc(q.n)+'</span><span class="q-title">'+esc(q.title)+'</span></div>'+
+        '<div class="q-right"><span class="q-choice">'+esc(q.choice)+'</span><span class="arrow">▶</span></div>'+
+      '</div>'+
+      '<div class="q-body"><div class="q-body-inner">'+
+        '<div class="options">'+q.opts.map((o,oi)=>'<span class="opt '+(oi===q.sel?'sel':'')+'">'+esc(o)+'</span>').join('')+'</div>'+
+        '<div class="just">'+esc(q.just)+'</div>'+
+        '<div class="src">Источник: '+esc(q.src)+'</div>'+
+      '</div></div></div>';
+  });
+  h+='</div>';
+  document.getElementById('profile').innerHTML=h;
+}
+
+function renderTeam(){
+  const r=cur;
+  let h='<div class="card"><h3>Команда — '+esc(r.region)+'</h3>'+
+   '<div class="note">Зелёная полоса — единая линия с главой; оранжевая — собственный вектор / центр влияния.</div></div><div class="grid">';
+  r.team.forEach(t=>{
+    const cls=t.vec==='own'?'own':'unified';
+    const tag=t.vec==='own'?'o':'u';
+    h+='<div class="team-card '+cls+'">'+
+      '<h4>'+esc(t.fio)+'</h4><div class="role">'+esc(t.role)+'</div>'+
+      '<div class="bg"><b>Направление:</b> '+esc(t.dir)+'<br><b>Бэкграунд:</b> '+esc(t.bg)+'</div>'+
+      '<span class="vec-tag '+tag+'">'+esc(t.vecLabel)+'</span>'+
+      '<span class="digi">Цифровизация: '+esc(t.digi)+'</span></div>';
+  });
+  h+='</div>';
+  document.getElementById('team').innerHTML=h;
+}
+
+function lineChart(s){
+  const W=420,H=170,pl=42,pr=16,pt=18,pb=30;
+  const vs=s.points.map(p=>p.v);
+  let min=Math.min(...vs),max=Math.max(...vs);
+  if(min===max){min-=1;max+=1;}
+  const span=max-min,padV=span*0.18;min-=padV;max+=padV;
+  const inv=s.better==='lower'; // место: меньше = выше на графике
+  const X=i=>pl+(s.points.length===1?((W-pl-pr)/2):(i/(s.points.length-1))*(W-pl-pr));
+  const Y=v=>{const n=(v-min)/(max-min);return inv?pt+n*(H-pt-pb):H-pb-n*(H-pt-pb);};
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Динамика: '+esc(s.name)+'">';
+  // сетка
+  [0,0.5,1].forEach(f=>{const y=pt+f*(H-pt-pb);
+    svg+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-pr)+'" y2="'+y+'" stroke="#EEF0F4"/>';});
+  // линия и область
+  let path='',area='';
+  s.points.forEach((p,i)=>{const x=X(i),y=Y(p.v);path+=(i?'L':'M')+x+' '+y+' ';});
+  const first=X(0),last=X(s.points.length-1),base=H-pb;
+  area='M'+first+' '+base+' '+path.replace('M','L')+'L'+last+' '+base+' Z';
+  svg+='<path d="'+area+'" fill="#FF4F12" fill-opacity="0.08"/>';
+  svg+='<path d="'+path+'" fill="none" stroke="#FF4F12" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  // точки и подписи
+  s.points.forEach((p,i)=>{
+    const x=X(i),y=Y(p.v);
+    svg+='<circle cx="'+x+'" cy="'+y+'" r="4.5" fill="#fff" stroke="#FF4F12" stroke-width="2.5"/>';
+    svg+='<text x="'+x+'" y="'+(y-10)+'" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2434">'+p.v+'</text>';
+    svg+='<text x="'+x+'" y="'+(H-9)+'" text-anchor="middle" font-size="10.5" fill="#7A8294">'+esc(p.t)+'</text>';
+  });
+  svg+='<text x="10" y="'+(pt+8)+'" font-size="10" fill="#A6ADBD" transform="rotate(-90,10,'+(pt+8)+')" text-anchor="end">'+(inv?'лучше ↑':'лучше ↑')+'</text>';
+  svg+='</svg>';
+  return svg;
+}
+
+function renderRatings(){
+  const r=cur,el=document.getElementById('ratings');
+  if(!r.ratings){
+    el.innerHTML='<div class="card"><h3>Рейтинги главы — '+esc(r.region)+'</h3>'+
+      '<div class="note">Демо-заглушка: серии рейтингов (АПЭК, «Госсовет 2.0», медиарейтинги) заполняются при исследовании региона. Структура данных: ratings:{kpis:[...],series:[{name,better,unit,points:[{t,v}],note,src}],summary}.</div></div>';
+    return;
+  }
+  let h='<div class="card"><h3>Рейтинги главы в динамике — '+esc(r.name)+'</h3>'+
+    '<div class="note" style="margin-bottom:16px">Позиции 2024–2026 гг. по основным экспертным и медийным рейтингам. Для рейтингов-мест ось инвертирована: выше на графике = лучше позиция.</div>'+
+    '<div class="kpi-row">'+r.ratings.kpis.map(k=>'<div class="kpi"><div class="k-val">'+esc(k.val)+'<span>'+esc(k.unit)+'</span></div><div class="k-lbl">'+esc(k.lbl)+'</div></div>').join('')+'</div></div>';
+  h+='<div class="r-grid">';
+  r.ratings.series.forEach(s=>{
+    const a=s.points[0].v,b=s.points[s.points.length-1].v;
+    const improved=s.better==='lower'?b<a:b>a;
+    const dcls=b===a?'flat':(improved?'up':'down');
+    const dtxt=b===a?'без изменений':(s.better==='lower'
+        ?(improved?'▲ улучшение: '+a+' → '+b:'▼ снижение: '+a+' → '+b)
+        :(improved?'▲ рост: '+a+' → '+b:'▼ падение: '+a+' → '+b));
+    h+='<div class="r-card"><div class="r-head"><div><h4>'+esc(s.name)+'</h4><div class="r-sub">'+esc(s.sub)+'</div></div>'+
+      '<div class="r-now"><div class="val">'+b+'</div><div class="unit">'+esc(s.unit)+'</div><div class="delta '+dcls+'">'+dtxt+'</div></div></div>'+
+      lineChart(s)+
+      '<div class="r-note">'+esc(s.note)+'</div>'+
+      '<div class="r-src">Источник: '+esc(s.src)+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="card" style="margin-top:18px"><h3>Что это значит для поставщика</h3><div class="class-summary" style="margin-bottom:0">'+esc(r.ratings.summary)+'</div></div>';
+  el.innerHTML=h;
+}
+
+/* --- Радар продаж: 6 контуров мониторинга --- */
+async function updateRadarSignals(){
+  const r=cur;
+  if(!r.intel){alert("Для этого региона радар не заполнен.");return;}
+  openModal('<h3>Обновление сигналов радара: '+esc(r.region)+'</h3>'+
+    '<p>ИИ-поиск: свежие ИТ-акценты губернатора, новые соглашения на форумах, федеральные рейтинг-триггеры (аварийность, ДТП, цифровая зрелость).</p>'+
+    '<div class="log" id="ailog"></div>'+
+    '<div class="row"><button class="tb-btn ghost" onclick="closeModal()">Закрыть</button>'+
+    '<button class="tb-btn accent" id="goRad">Запустить поиск</button></div>');
+  document.getElementById('goRad').onclick=async function(){
+    this.disabled=true;this.innerHTML='<span class="spinner"></span> Поиск...';
+    try{
+      logLine("→ Поиск ИТ-акцентов и соглашений...");
+      const p='По региону «'+r.region+'» (глава '+r.name+') за последние 60 дней найди: 1) заявления главы по ИТ/цифровизации (образование, ЖКХ, медицина, безопасность, транспорт); 2) подписанные соглашения на форумах с ИТ/инфраструктурной составляющей; 3) негативные федеральные триггеры (рост смертности в ДТП, аварии ЖКХ, падение в рейтинге цифровой зрелости). Ответь ТОЛЬКО JSON: {"signals":[{"heat":"hot|warm","txt":"суть + вывод для поставщика ИКТ","meta":"источник, дата"}],"deals":[{"deal":"что подписано","signal":"о чём говорит","adjacent":"какие смежные продукты предлагать"}]}';
+      const j=parseJSON(await askClaude(p,true));
+      if(j.signals&&j.signals.length){r.intel.media.signals=[...j.signals,...r.intel.media.signals];logLine("✓ Сигналов добавлено: "+j.signals.length);}
+      if(j.deals&&j.deals.length){r.intel.forums.deals=[...j.deals,...r.intel.forums.deals];logLine("✓ Соглашений добавлено: "+j.deals.length);}
+      markUpdated(r,['radar']);
+      renderRadar();renderFreshness();
+      logLine("Готово. «Экспорт JSON» — чтобы сохранить.");
+    }catch(e){logLine("✗ Ошибка: "+e.message);}
+    this.disabled=false;this.textContent="Запустить ещё раз";
+  };
+}
+
+function renderRadar(){
+  const r=cur,el=document.getElementById('radar');
+  if(!r.intel){
+    el.innerHTML='<div class="card"><h3>Радар продаж — '+esc(r.region)+'</h3><div class="note">Демо-регион: шесть контуров мониторинга (бюджет, план-график закупок, периодичные закупки, медиа-сигналы, форумные соглашения, боли граждан) заполняются при исследовании. Структура: intel:{budget, procurement, recurring, media, forums, pains}.</div></div>';
+    return;
+  }
+  const it=r.intel;
+  let h='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">Радар продаж — шесть контуров мониторинга</h3>'+
+    '<button class="tb-btn accent" onclick="updateRadarSignals()">⟳ Обновить сигналы (ИИ)</button></div>'+
+    '<div class="note">Операционная система работы с регионом: что мониторим, с какой периодичностью и какое действие следует из каждого сигнала.</div></div>';
+
+  /* 1. Бюджет */
+  h+='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">1 · Бюджет '+it.budget.year+' и мониторинг изменений</h3><span class="cadence">'+esc(it.budget.cadence)+'</span></div>'+
+    '<div class="budget-bars">'+it.budget.items.map(b=>'<div class="bb"><div>'+esc(b.name)+'</div><div class="track"><div class="fill'+(b.acc?' acc':'')+'" style="width:'+Math.min(100,b.v/b.max*100).toFixed(1)+'%"></div></div><div class="num">'+b.v.toLocaleString('ru-RU')+' млрд ₽</div></div>').join('')+'</div>'+
+    '<div class="r-note" style="margin-top:14px">'+esc(it.budget.notes)+'</div>'+
+    '<div style="margin-top:12px">'+it.budget.watch.map(w=>'<span class="stmt-tag" style="margin-bottom:6px">'+esc(w)+'</span>').join(' ')+'</div></div>';
+
+  /* 2. План-график закупок */
+  const sp={won:"выиграно",lost:"проиграно",open:"в работе"};
+  h+='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">2 · План-график закупок по статьям</h3><span class="cadence">'+esc(it.procurement.cadence)+'</span></div>'+
+    '<div class="table-wrap" style="box-shadow:none;border:1px solid var(--line)"><table><thead><tr><th>Позиция</th><th>Заказчик</th><th>Статус</th><th>Действие</th></tr></thead><tbody>'+
+    it.procurement.rows.map(p=>'<tr><td><b>'+esc(p.item)+'</b></td><td>'+esc(p.gz)+'</td><td><span class="status-pill '+p.status+'">'+sp[p.status]+'</span></td><td>'+esc(p.note)+'</td></tr>').join('')+
+    '</tbody></table></div></div>';
+
+  /* 3. Периодичные закупки */
+  h+='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">3 · Периодичные (ежегодные) закупки: разбор проигрышей</h3><span class="cadence">'+esc(it.recurring.cadence)+'</span></div>'+
+    '<div class="table-wrap" style="box-shadow:none;border:1px solid var(--line)"><table><thead><tr><th>Закупка</th><th>Период</th><th>Статус</th><th>Причина</th><th>Коммуникация с заказчиком</th></tr></thead><tbody>'+
+    it.recurring.rows.map(p=>'<tr><td><b>'+esc(p.item)+'</b></td><td>'+esc(p.period)+'</td><td><span class="status-pill '+p.status+'">'+sp[p.status]+'</span></td><td>'+esc(p.reason)+'</td><td>'+esc(p.action)+'</td></tr>').join('')+
+    '</tbody></table></div><div class="note" style="margin-top:10px">'+esc(it.recurring.note)+'</div></div>';
+
+  /* 4. Медиа-мониторинг */
+  h+='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">4 · Медиа: акценты губернатора по ИТ + федеральные рейтинг-триггеры</h3><span class="cadence">'+esc(it.media.cadence)+'</span></div>'+
+    it.media.signals.map(s=>'<div class="sig '+esc(s.heat)+'">'+esc(s.txt)+'<div class="sig-meta">'+esc(s.meta)+'</div></div>').join('')+
+    '<div class="note">Оранжевая полоса — горячий сигнал (действие в течение месяца), жёлтая — тёплый (в квартальный план).</div></div>';
+
+  /* 5. Форумы и соглашения */
+  h+='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">5 · Форумные соглашения → смежные продукты</h3><span class="cadence">'+esc(it.forums.cadence)+'</span></div>'+
+    '<div class="table-wrap" style="box-shadow:none;border:1px solid var(--line)"><table><thead><tr><th>Соглашение / событие</th><th>Сигнал</th><th>Смежное предложение БИС</th></tr></thead><tbody>'+
+    it.forums.deals.map(d=>'<tr><td><b>'+esc(d.deal)+'</b></td><td>'+esc(d.signal)+'</td><td><span class="arrow-to">→</span> '+esc(d.adjacent)+'</td></tr>').join('')+
+    '</tbody></table></div><div class="note" style="margin-top:10px">'+esc(it.forums.note)+'</div></div>';
+
+  /* 6. Боли граждан */
+  h+='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">6 · Боли граждан (ЦУР, соцсети) + правительственный час</h3><span class="cadence">'+esc(it.pains.cadence)+'</span></div>'+
+    '<div class="table-wrap" style="box-shadow:none;border:1px solid var(--line)"><table><thead><tr><th>Устойчивая боль</th><th>Решение под неё</th></tr></thead><tbody>'+
+    it.pains.rows.map(p=>'<tr><td><b>'+esc(p.pain)+'</b></td><td><span class="arrow-to">→</span> '+esc(p.solution)+'</td></tr>').join('')+
+    '</tbody></table></div><div class="note" style="margin-top:10px">'+esc(it.pains.note)+'</div></div>';
+
+  el.innerHTML=h;
+}
+
+let sortKey=null,sortAsc=true;
+function setSort(k){if(sortKey===k)sortAsc=!sortAsc;else{sortKey=k;sortAsc=true;}renderICT();}
+function renderICT(){
+  const r=cur;
+  const priRank={high:3,mid:2,low:1};
+  let data=r.ict.slice();
+  if(sortKey){
+    data.sort((a,b)=>{
+      let va,vb;
+      if(sortKey==='pri'){va=priRank[a.pri];vb=priRank[b.pri];}
+      else{va=(a[sortKey]||'').toLowerCase();vb=(b[sortKey]||'').toLowerCase();}
+      if(va<vb)return sortAsc?-1:1; if(va>vb)return sortAsc?1:-1; return 0;
+    });
+  }
+  const pl={high:'ВЫСОКИЙ',mid:'СРЕДНИЙ',low:'НИЗКИЙ'};
+  const ind=k=>sortKey===k?'<span class="sort-ind">'+(sortAsc?'▲':'▼')+'</span>':'';
+  let h='<div class="card"><h3>Карта интересов в ИКТ-продуктах Ростелекома — '+esc(r.region)+'</h3>'+
+   '<div class="note">Клик по заголовку столбца — сортировка. Приоритеты обоснованы фактами 2024–2026 гг.</div></div>';
+  h+='<div class="table-wrap"><table><thead><tr>'+
+    '<th onclick="setSort(\'prod\')">Продукт'+ind('prod')+'</th>'+
+    '<th onclick="setSort(\'pri\')">Приоритет'+ind('pri')+'</th>'+
+    '<th onclick="setSort(\'owner\')">Владелец в команде'+ind('owner')+'</th>'+
+    '<th>Обоснование (2024–2026)</th>'+
+    '<th onclick="setSort(\'fin\')">Модель финансирования'+ind('fin')+'</th>'+
+    '</tr></thead><tbody>';
+  data.forEach(p=>{
+    h+='<tr><td><b>'+esc(p.prod)+'</b></td>'+
+      '<td><span class="pri '+p.pri+'">'+pl[p.pri]+'</span></td>'+
+      '<td>'+esc(p.owner)+'</td><td>'+esc(p.just)+'</td><td>'+esc(p.fin)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  /* Каталог продуктов ЦР: не оценённые для региона — к проработке */
+  const assessed=r.ict.map(p=>p.prod);
+  const todo=PRODUCT_CATALOG.filter(p=>assessed.indexOf(p)<0);
+  if(todo.length){
+    h+='<div class="card" style="margin-top:18px"><h3>Номенклатура «Цифровых регионов»: продукты к проработке ('+todo.length+')</h3>'+
+      '<div class="note" style="margin-bottom:10px">Полный каталог — '+PRODUCT_CATALOG.length+' продуктов (v1.1). Ниже — ещё не оценённые для этого региона: приоритет, владелец и модель финансирования добавляются исследованием.</div>'+
+      todo.map(p=>'<span class="stmt-tag" style="margin-bottom:6px;font-size:11.5px;padding:4px 11px">'+esc(p)+'</span>').join(' ')+'</div>';
+  }
+  document.getElementById('ict').innerHTML=h;
+}
+
+var compareFO='Все ФО';
+function renderCompare(){
+  const W=940,H=580,pad=76;
+  const xs=v=>pad+(v/100)*(W-2*pad);
+  const ys=v=>H-pad-(v/100)*(H-2*pad);
+  const maxPop=Math.max(...REGIONS.map(r=>r.population));
+  const rad=p=>7+Math.sqrt(p/maxPop)*30;
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Пузырьковая диаграмма сравнения глав регионов">';
+  svg+='<rect x="'+pad+'" y="'+pad+'" width="'+(W-2*pad)+'" height="'+(H-2*pad)+'" fill="#F7F8FA" stroke="#DFE2E9" rx="14"/>';
+  svg+='<line x1="'+xs(50)+'" y1="'+pad+'" x2="'+xs(50)+'" y2="'+(H-pad)+'" stroke="#DFE2E9" stroke-dasharray="5"/>';
+  svg+='<line x1="'+pad+'" y1="'+ys(50)+'" x2="'+(W-pad)+'" y2="'+ys(50)+'" stroke="#DFE2E9" stroke-dasharray="5"/>';
+  svg+='<text x="'+(W/2)+'" y="'+(H-26)+'" fill="#7A8294" font-size="14" font-weight="600" text-anchor="middle">Хозяйственник (0) ← ось X → Лидер (100)</text>';
+  svg+='<text x="26" y="'+(H/2)+'" fill="#7A8294" font-size="14" font-weight="600" text-anchor="middle" transform="rotate(-90,26,'+(H/2)+')">Операционщик (0) ← ось Y → Стратег (100)</text>';
+  svg+='<text x="'+(pad+10)+'" y="'+(pad+22)+'" fill="#A6ADBD" font-size="11.5">Стратег-хозяйственник</text>';
+  svg+='<text x="'+(W-pad-10)+'" y="'+(pad+22)+'" fill="#A6ADBD" font-size="11.5" text-anchor="end">Стратег-лидер</text>';
+  svg+='<text x="'+(pad+10)+'" y="'+(H-pad-12)+'" fill="#A6ADBD" font-size="11.5">Операционщик-хозяйственник</text>';
+  svg+='<text x="'+(W-pad-10)+'" y="'+(H-pad-12)+'" fill="#A6ADBD" font-size="11.5" text-anchor="end">Операционщик-лидер</text>';
+  // Фильтр по ФО; сначала базовый слой (мелкие серые), поверх — полные (оранжевые)
+  const shown=REGIONS.map((r,i)=>({r,i})).filter(o=>compareFO==='Все ФО'||o.r.fo===compareFO);
+  const order=shown.slice().sort((a,b)=>(a.r.isDemo?0:1)-(b.r.isDemo?0:1));
+  order.forEach(({r,i})=>{
+    const cx=xs(r.x),cy=ys(r.y),rr=rad(r.population);
+    const col=r.isDemo?(r.tier==="base"?'#8B93A5':'#5B6272'):'#FF4F12';
+    svg+='<circle class="bubble" cx="'+cx+'" cy="'+cy+'" r="'+rr+'" fill="'+col+'" fill-opacity="'+(r.isDemo?0.45:0.7)+'" stroke="'+col+'" stroke-width="1.2" onclick="goProfile('+i+')" onmousemove="showTT(event,'+i+')" onmouseout="hideTT()"/>';
+    if(!r.isDemo||rr>16){
+      svg+='<text x="'+cx+'" y="'+(cy+4)+'" fill="#fff" font-size="'+(rr>16?12:9)+'" font-weight="700" text-anchor="middle" pointer-events="none">'+esc(r.initials)+'</text>';
+    }
+    if(!r.isDemo){
+      svg+='<text x="'+cx+'" y="'+(cy+rr+15)+'" fill="#3A4152" font-size="11.5" font-weight="700" text-anchor="middle" pointer-events="none">'+esc(r.region)+'</text>';
+    }
+  });
+  svg+='</svg>';
+  const foOpts=['Все ФО'].concat(Object.keys(FO_MAP));
+  let h='<div class="card"><div class="radar-head"><h3 style="margin-bottom:0">Сравнение глав регионов по типам — '+(compareFO==='Все ФО'?'все субъекты РФ':compareFO)+' ('+shown.length+')</h3>'+
+    '<select onchange="compareFO=this.value;renderCompare()" style="background:#F7F8FA;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer">'+
+    foOpts.map(o=>'<option'+(o===compareFO?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'+
+    '<div class="note">Размер пузыря — население. Наведение — карточка главы, клик — переход в профиль. Оранжевые — полные исследованные профили; серые — базовый слой (стартовая типология, требует верификации).</div>'+
+    '<div class="bubble-wrap">'+svg+'</div>'+
+    '<div class="legend">'+
+      '<span><span class="dot" style="background:#FF4F12"></span><b>Полный профиль</b> — глубокое исследование (Башкортостан)</span>'+
+      '<span><span class="dot" style="background:#5B6272"></span><b>Демо</b> — расширенная заглушка</span>'+
+      '<span><span class="dot" style="background:#8B93A5"></span><b>База</b> — все главы РФ, стартовая оценка</span>'+
+    '</div></div>';
+  document.getElementById('compare').innerHTML=h;
+}
+
+function goProfile(i){
+  sel.value=i;cur=REGIONS[i];renderAll();
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelector('nav button[data-tab="profile"]').classList.add('active');
+  document.getElementById('profile').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+const tt=document.getElementById('tt');
+function showTT(e,i){
+  const r=REGIONS[i];
+  tt.innerHTML='<b>'+esc(r.name)+'</b><br>'+esc(r.region)+'<br>'+esc(r.classification.label)+'<br>Население: '+r.population.toLocaleString('ru-RU');
+  tt.style.opacity=1;tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY+14)+'px';
+}
+function hideTT(){tt.style.opacity=0;}
+
+function renderAll(){renderProfile();renderStatements();renderTeam();renderRatings();renderICT();renderRadar();renderFreshness();
+  if(document.getElementById('compare').classList.contains('active'))renderCompare();}
+
+/* Бутстрап: пробуем внешний источник, затем рендерим */
+(async function bootstrap(){
+  await loadRemoteData();
+  cur=REGIONS[0];
+  buildSelector();
+  renderAll();
+})();
+</script>
+</body>
+</html>
